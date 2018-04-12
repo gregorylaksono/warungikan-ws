@@ -12,42 +12,44 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.warungikan.db.model.Agent;
 import org.warungikan.db.model.User;
 import org.warungikan.db.view.View;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
 import id.travel.api.model.BasicResponse;
-import id.travel.api.service.IAgentService;
+import id.travel.api.service.IUserService;
 
 @RestController
-@RequestMapping("/agent")
+@RequestMapping("/user")
 public class AgentController {
 
 	@Autowired
-	private IAgentService agentService;
+	private IUserService userService;
 	
-	@PostMapping("/register/user/{userId}")
+	@PostMapping("/register")
 	@JsonView(View.Public.class)
-	public ResponseEntity<BasicResponse> register(@RequestBody Agent agent, @PathVariable("userId") Long userId){
+	public ResponseEntity<BasicResponse> register(@RequestBody User user){
 	
-		Agent t = agentService.registerAgent(userId, agent.getName());
-		return new ResponseEntity<BasicResponse>(new BasicResponse("Agent successfuly registered", "SUCCES", t.getName()), HttpStatus.OK);
+		User t = userService.register(user);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("User successfuly registered", "SUCCES", t.getName()), HttpStatus.OK);
 	}
 	
-	@GetMapping("/list")
+	@GetMapping("/list/agent")
 	@JsonView(View.Public.class)
 	public ResponseEntity<List> getAgent(){
 	
-		List<Agent> t = agentService.getAllAgents();
+		List<User> t = userService.getAllAgents();
 		return new ResponseEntity<List>(t, HttpStatus.OK);
 	}
 	
-	@GetMapping("/{agent-id}")
+	@GetMapping("/login")
 	@JsonView(View.Public.class)
-	public ResponseEntity<Agent> getOne(@PathVariable("agent-id") Long agentId){
-		Agent agent = agentService.getAgentByUserId(agentId);
-		return new ResponseEntity<Agent>(agent, HttpStatus.OK);
+	public ResponseEntity<BasicResponse> login(@RequestParam("userid") 	String userid, 
+											   @RequestParam("password")String password){
+	
+		User t = userService.login(userid, password);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("User successfuly registered", "SUCCES", t.getName()), HttpStatus.OK);
 	}
+	
 }
