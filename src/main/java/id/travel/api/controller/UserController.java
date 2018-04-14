@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
 import org.warungikan.db.repository.UserRepository;
 import org.warungikan.db.view.View;
@@ -33,15 +34,31 @@ public class UserController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	@PostMapping("/register")
-	public ResponseEntity register(@RequestBody User user){
-		user.setName("test").setAddress("addr").setBalance(30000l).setUserid(user.getUserid()).
-		setCity("depok").setEmail("greg.laksono@gmail.com").setEnable(true).setPassword(passwordEncoder.encode(user.getPassword())).
-		setLatitude(30000d).setLongitude(12.90111D).setTelpNo("1232312323").setRoles(Arrays.asList(userService.getRoleByName("ROLE_USER"))).
-		setCreationDate(new Date());
-		userService.register(user);
+	@PostMapping("/register-customer")
+	public ResponseEntity registerCustomer(@RequestBody User user){
 		
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", user.getEmail()), HttpStatus.OK);
+		Role roles = userService.getRoleByName("ROLE_USER");
+		User u = registerUser(user, roles);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("Customer is registered", "SUCCESS", u.getUserid()), HttpStatus.OK);
+	}
+	
+	@PostMapping("/register-agent")
+	public ResponseEntity registerAgent(@RequestBody User user){
+		
+		Role roles = userService.getRoleByName("ROLE_AGENT");
+		User u = registerUser(user, roles);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("Agent is registered", "SUCCESS", u.getUserid()), HttpStatus.OK);
+	}
+	
+	public User registerUser(User user, Role roles){
+		user.setName("test").setAddress("addr").setBalance(0l).setUserid(user.getUserid()).
+		setCity("depok").setEmail("greg.laksono@gmail.com").setEnable(true).setPassword(passwordEncoder.encode(user.getPassword())).
+		setLatitude(30000d).setLongitude(12.90111D).setTelpNo("1232312323").
+		
+		setRoles(Arrays.asList(roles)).
+		setCreationDate(new Date());
+		return userService.register(user);
+		
 	}
 	
 	@GetMapping("/all")

@@ -1,9 +1,12 @@
 package id.travel.api.config;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -50,10 +53,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             HttpServletResponse res,
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
-    	String role = auth.getAuthorities().stream().findFirst().map( e-> e.getAuthority()).get();
+//    	List<String> role = auth.getAuthorities().stream().map( e-> e.getAuthority()).collect(Collectors.toList());
         String token = Jwts.builder()
                 .setSubject(((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername())
-                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME)).claim("ROLE", role)
+                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+//                .claim("ROLE", role.toArray())
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET)
                 .compact();
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);

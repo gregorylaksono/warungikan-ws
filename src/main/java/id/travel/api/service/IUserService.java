@@ -14,4 +14,5 @@ public interface IUserService {
 	public List<User> getAllUsers();
 	public Role getRoleByName(String name);
 	public User getUserById(String userId);
+	public void setAvailableUser(String userId, Boolean enabled);
 }

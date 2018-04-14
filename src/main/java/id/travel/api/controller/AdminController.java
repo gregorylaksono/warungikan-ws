@@ -36,7 +36,6 @@ public class AdminController {
 	
 	@RequestMapping(value="/test2", method= RequestMethod.GET)
 	public ResponseEntity<?> test2(HttpServletRequest request) {
-//		request.getUserPrincipal()
 	  if ( request.isUserInRole("ADMIN") ) {
 	 
 	    Principal userPrincipal = request.getUserPrincipal();

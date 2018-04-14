@@ -1,5 +1,6 @@
 package id.travel.api.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,6 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User register(User user) {
-		
 		return userRepository.save(user);
 	}
 
@@ -59,5 +59,14 @@ public class UserServiceImpl implements IUserService{
 	public User getUserById(String userId) {
 		return userRepository.findUserByUserId(userId);
 	}
+
+	@Override
+	public void setAvailableUser(String userId, Boolean enabled) {
+		User user = userRepository.findUserByUserId(userId);
+		user.setEnable(enabled);
+		user.setLastModifiedDate(new Date());
+		userRepository.save(user);
+	}
+
 
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.warungikan.db.model.Privilege;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
-import org.warungikan.db.repository.PrivilegeRepository;
 import org.warungikan.db.repository.RoleRepository;
 import org.warungikan.db.repository.UserRepository;
 
@@ -31,8 +30,6 @@ ApplicationListener<ContextRefreshedEvent> {
 	@Autowired
 	private RoleRepository roleRepository;
 
-	@Autowired
-	private PrivilegeRepository privilegeRepository;
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
@@ -43,15 +40,10 @@ ApplicationListener<ContextRefreshedEvent> {
 
 		if (alreadySetup)
 			return;
-		Privilege readPrivilege
-		= createPrivilegeIfNotFound("READ_PRIVILEGE");
-		Privilege writePrivilege
-		= createPrivilegeIfNotFound("WRITE_PRIVILEGE");
-
-		List<Privilege> adminPrivileges = Arrays.asList(
-				readPrivilege, writePrivilege);        
-		createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-		createRoleIfNotFound("ROLE_USER", Arrays.asList(readPrivilege));
+		
+		createRoleIfNotFound("ROLE_ADMIN");
+		createRoleIfNotFound("ROLE_USER");
+		createRoleIfNotFound("ROLE_AGENT");
 
 		createMasterUserIfNotFound();
 
@@ -82,25 +74,14 @@ ApplicationListener<ContextRefreshedEvent> {
 		}
 	}
 
-	@Transactional
-	private Privilege createPrivilegeIfNotFound(String name) {
-
-		Privilege privilege = privilegeRepository.findByName(name);
-		if (privilege == null) {
-			privilege = new Privilege(name);
-			privilegeRepository.save(privilege);
-		}
-		return privilege;
-	}
 
 	@Transactional
 	private Role createRoleIfNotFound(
-			String name, Collection<Privilege> privileges) {
+			String name) {
 
 		Role role = roleRepository.findByName(name);
 		if (role == null) {
 			role = new Role(name);
-			role.setPrivileges(privileges);
 			roleRepository.save(role);
 		}
 		return role;
