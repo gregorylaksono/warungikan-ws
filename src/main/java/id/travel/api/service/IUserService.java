@@ -2,6 +2,7 @@ package id.travel.api.service;
 
 import java.util.List;
 
+import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
 
 public interface IUserService {
@@ -11,4 +12,6 @@ public interface IUserService {
 	public User generateUserId();
 	public List<User> getAllAgents();
 	public List<User> getAllUsers();
+	public Role getRoleByName(String name);
+	public User getUserById(String userId);
 }
