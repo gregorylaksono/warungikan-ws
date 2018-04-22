@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.warungikan.db.model.Privilege;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
 import org.warungikan.db.repository.UserRepository;
@@ -29,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			throw new UsernameNotFoundException(username);
 		}
 		return new org.springframework.security.core.userdetails.User(
-				applicationUser.getUserid(), applicationUser.getPassword(), getAuthorities(applicationUser.getRoles()));
+				applicationUser.getEmail(), applicationUser.getPassword(), getAuthorities(applicationUser.getRoles()));
 	}
 	
 	private Collection<? extends GrantedAuthority> getAuthorities(
@@ -40,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private List<String> getPrivileges(Collection<Role> roles) {
 
-		List<String> privileges = new ArrayList<>();
+		List<String> privileges = new ArrayList();
 		for (Role role : roles) {
 			privileges.add(role.getName());
 		}
@@ -48,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	}
 
 	private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
-		List<GrantedAuthority> authorities = new ArrayList<>();
+		List<GrantedAuthority> authorities = new ArrayList();
 		for (String privilege : privileges) {
 			authorities.add(new SimpleGrantedAuthority(privilege));
 		}

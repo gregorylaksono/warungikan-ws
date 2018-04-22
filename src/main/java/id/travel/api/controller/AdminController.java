@@ -46,6 +46,6 @@ public class AdminController {
 	        log.info("part of group: "+s);
 	    }
 	  }
-	  return new ResponseEntity<>("ok !!", HttpStatus.OK);
+	  return new ResponseEntity("ok !!", HttpStatus.OK);
 	}
 }

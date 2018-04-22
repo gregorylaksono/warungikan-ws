@@ -15,4 +15,5 @@ public interface IUserService {
 	public Role getRoleByName(String name);
 	public User getUserById(String userId);
 	public void setAvailableUser(String userId, Boolean enabled);
+	public User update(User user);
 }

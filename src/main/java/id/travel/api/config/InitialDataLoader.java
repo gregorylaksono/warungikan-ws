@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.warungikan.db.model.Privilege;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
 import org.warungikan.db.repository.RoleRepository;
@@ -65,7 +64,6 @@ ApplicationListener<ContextRefreshedEvent> {
 			user.setLatitude(0d);
 			user.setLongitude(0d);
 			user.setTelpNo("no-value");
-			user.setUserid("paniki");
 			user.setPassword(passwordEncoder.encode("gregory1234"));
 			user.setEmail("greg.laksono@gmail.com");
 			user.setRoles(Arrays.asList(adminRole));

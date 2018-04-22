@@ -30,6 +30,7 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User register(User user) {
+		user.setCreationDate(new Date());
 		return userRepository.save(user);
 	}
 
@@ -66,6 +67,12 @@ public class UserServiceImpl implements IUserService{
 		user.setEnable(enabled);
 		user.setLastModifiedDate(new Date());
 		userRepository.save(user);
+	}
+
+	@Override
+	public User update(User user) {
+		user.setLastModifiedDate(new Date());
+		return userRepository.save(user);
 	}
 
 
