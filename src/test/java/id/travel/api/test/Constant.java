@@ -36,7 +36,8 @@ public class Constant {
 	public static final String WS_UPDATE_USER_AGENT_URL = WS_URL+"admin/user";
 	public static final String WS_DELETE_USER_URL = WS_URL+"admin/user";
 	
-	public static final String WS_UPDATE_SELF_USER_URL = WS_URL+"/user";
-	public static final String WS_CHECK_USER_AS_USER_URL = WS_URL+"/user";
+	public static final String WS_UPDATE_SELF_USER_URL = WS_URL+"user";
+	public static final String WS_CHECK_USER_AS_USER_URL = WS_URL+"user";
 	public static final String WS_CREATE_USER_CUSTOMER_URL = WS_URL+"admin/user/customer";
+	public static final String WS_UPDATE_CHANGE_PWD_URL = WS_URL+"user/change_password";
 }

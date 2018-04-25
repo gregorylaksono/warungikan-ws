@@ -8,8 +8,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.warungikan.db.model.Role;
+import org.warungikan.db.model.TopupWalletHistory;
 import org.warungikan.db.model.User;
 import org.warungikan.db.repository.RoleRepository;
+import org.warungikan.db.repository.TopupWalletRepository;
 import org.warungikan.db.repository.UserRepository;
 
 import id.travel.api.service.IUserService;
@@ -23,6 +25,8 @@ public class UserServiceImpl implements IUserService{
 	@Autowired
 	private RoleRepository roleRepository;
 	
+	@Autowired
+	private TopupWalletRepository topUpWalletRepository;
 	
 	@Override
 	public User login(String email, String password) {
@@ -34,6 +38,7 @@ public class UserServiceImpl implements IUserService{
 	public User register(User user) {
 		if(!isUserIdExist(user.getEmail())){
 			user.setCreationDate(new Date());
+			user.setEnable(true);
 			return userRepository.save(user);			
 		}else{
 			return null;
@@ -122,6 +127,34 @@ public class UserServiceImpl implements IUserService{
 		
 		return null;
 		
+	}
+
+	@Override
+	public Boolean changePassword(String user_id, String password, String newPassword) {
+		User u = userRepository.findUserByUserId(user_id);
+		if(u.getPassword().equalsIgnoreCase(password)){
+			u.setPassword(newPassword);
+			userRepository.save(u);
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	@Override
+	public Boolean addBalance(String user_id, Long amount) {
+		User u = userRepository.findUserByUserId(user_id);
+		if(u!=null){
+			TopupWalletHistory t = new TopupWalletHistory();
+			t.setAmount(amount);
+			t.setUser(u);
+			t.setCreationDate(new Date());
+			u.setBalance(u.getBalance() + amount);
+			topUpWalletRepository.save(t);
+			userRepository.save(u);
+			return true;
+		}
+		return true;
 	}
 
 

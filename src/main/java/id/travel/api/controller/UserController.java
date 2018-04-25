@@ -25,6 +25,7 @@ import org.warungikan.db.model.User;
 import org.warungikan.db.repository.UserRepository;
 
 import id.travel.api.model.BasicResponse;
+import id.travel.api.model.ChangePassword;
 import id.travel.api.service.IUserService;
 import id.travel.api.utils.SecurityUtils;
 
@@ -39,7 +40,7 @@ public class UserController {
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@GetMapping("/user/{user_id}")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
 	public ResponseEntity getMyData(@PathVariable("user_id") String user_id, HttpServletRequest request){
 	    String token = request.getHeader(HEADER_STRING);
 	    String username = SecurityUtils.getUsernameByToken(token);
@@ -49,14 +50,28 @@ public class UserController {
 			return new ResponseEntity<User>(u, HttpStatus.OK);	
 		}
 		else{
-			return new ResponseEntity(new BasicResponse("Not authorized to see the detail", "FAILED", ""), HttpStatus.OK);
+			return new ResponseEntity<User>(u, HttpStatus.NOT_FOUND);	
 		}
 	}
 
 	@PutMapping("/user/{user_id}")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
 	public ResponseEntity updateUserById(@PathVariable("user_id") String user_id, @RequestBody User user){
 		User u = userService.update(user_id,user);
 		return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
 	}
+	
+	@PutMapping("/user/change_password/{user_id}")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
+	public ResponseEntity changePassword(@PathVariable("user_id") String user_id, @RequestBody ChangePassword chPassword){
+		Boolean result = userService.changePassword(user_id, chPassword.getPassword(),
+				passwordEncoder.encode(chPassword.getNewPassword()));
+		if(result){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Password is updated", "SUCCESS", String.valueOf(result)), HttpStatus.OK);
+		}else{
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Old password is wrong", "FAILED", String.valueOf(result)), HttpStatus.OK);
+		}
+	}
+	
+	
 }

@@ -37,7 +37,7 @@ import id.travel.api.test.exception.WarungIkanNetworkException;
 @SpringBootTest(classes= TravelLauncher.class)
 @AutoConfigureTestDatabase(replace=Replace.NONE)
 @Transactional
-public class DBTest {
+public class ControllerTest {
 
 	@Autowired
 	IUserService userService;
@@ -48,7 +48,7 @@ public class DBTest {
 	@Test
 	public void admin_test_get_single_user(){
 		try {
-			userRepository.deleteAll();
+			
 			UserManagerImpl userManager = new UserManagerImpl();
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
@@ -70,7 +70,7 @@ public class DBTest {
 	public void admin_test_delete_single_user(){
 		UserManagerImpl userManager = new UserManagerImpl();
 		try {
-			userRepository.deleteAll();
+			
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 			int status = userManager.createUserAgent(jwt, "user1", "admin_test_delete_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
@@ -92,7 +92,7 @@ public class DBTest {
 	public void admin_test_update_single_user(){
 		UserManagerImpl userManager = new UserManagerImpl();
 		try {
-			userRepository.deleteAll();
+			
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 			int status = userManager.createUserAgent(jwt, "user1", "admin_test_update_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
@@ -134,7 +134,7 @@ public class DBTest {
 	public void admin_test_get_all_user(){
 		UserManagerImpl userManager = new UserManagerImpl();
 		try {
-			userRepository.deleteAll();
+			
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 			int status = userManager.createUserAgent(jwt, "user1", "admin_test_get_all_user1", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
@@ -164,7 +164,7 @@ public class DBTest {
 
 	@Test(expected = WarungIkanNetworkException.class)
 	public void test_update_user_as_user() throws UserSessionException, WarungIkanNetworkException{
-		userRepository.deleteAll();
+		
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 		int status = userManager.createUserAgent(jwt, "user1", "admin_test_get_all_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
@@ -180,7 +180,7 @@ public class DBTest {
 	
 	@Test(expected = UserSessionException.class)
 	public void test_create_user_as_user() throws UserSessionException, WarungIkanNetworkException{
-		userRepository.deleteAll();
+		
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 		int status = userManager.createUserAgent(jwt, "user1", "test_create_user_as_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
@@ -198,7 +198,7 @@ public class DBTest {
 	
 	@Test(expected = UserSessionException.class)
 	public void test_delete_user_as_user() throws UserSessionException, WarungIkanNetworkException{
-		userRepository.deleteAll();
+		
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 		int status = userManager.createUserAgent(jwt, "user1", "test_delete_user_as_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
@@ -209,6 +209,28 @@ public class DBTest {
 		// delete user as user role
 		jwt = userManager.login("test_delete_user_as_user", "testpassword");
 		userManager.deleteUser(jwt,"test_delete_user_as_user");
+	}
+
+	@Test
+	public void test_user_change_password() throws UserSessionException, WarungIkanNetworkException{
+		UserManagerImpl userManager = new UserManagerImpl();
+		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
+		int status = userManager.createUserAgent(jwt, "user1", "test_user_change_password5", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+
+		// Retrieve user by user id using admin role
+		Assert.assertEquals(status, 200);
+
+		// login user as user role
+		jwt = userManager.login("test_user_change_password5", "testpassword");
+		User  u = userManager.getUserAsUser(jwt, "test_user_change_password5");
+		Assert.assertNotNull(u);
+		Boolean result = userManager.changePassword(jwt, u.getEmail(), "newPassword", u.getPassword());
+		Assert.assertTrue(result);
+		
+		jwt = userManager.login("test_user_change_password5", "newPassword");
+		u = userManager.getUserAsUser(jwt, "test_user_change_password5");
+		
+		Assert.assertNotNull(u);
 	}
 
 }

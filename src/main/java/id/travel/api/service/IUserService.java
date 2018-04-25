@@ -17,4 +17,6 @@ public interface IUserService {
 	public void setAvailableUser(String userId, Boolean enabled);
 	public User update(String user_id, User user);
 	public User delete(String user_id);
+	public Boolean changePassword(String user_id, String password, String newPassword);
+	public Boolean addBalance(String user_id, Long amount);
 }
