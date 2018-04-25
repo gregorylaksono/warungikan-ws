@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,77 +26,37 @@ import org.warungikan.db.repository.UserRepository;
 
 import id.travel.api.model.BasicResponse;
 import id.travel.api.service.IUserService;
+import id.travel.api.utils.SecurityUtils;
 
 @RestController
 public class UserController {
 
+	static final String HEADER_STRING = "Authorization";
 	@Autowired
 	private IUserService userService;
 	
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	@PostMapping("/user/{type}")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity registerCustomer(@RequestBody User user,@PathVariable("type") String type){
-		
-		Role roles = null;
-		if(type.equalsIgnoreCase("admin")){
-			roles = userService.getRoleByName("ROLE_ADMIN");
-		}
-		else if (type.equalsIgnoreCase("agent")){
-			roles = userService.getRoleByName("ROLE_AGENT");
-		}
-		else {
-			roles = userService.getRoleByName("ROLE_USER");
-		}
-		User u = registerUser(user, roles);
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);
-	}
-	
 	@GetMapping("/user/{user_id}")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity checkUserId(@PathVariable("user_id") String user_id){
-		
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity getMyData(@PathVariable("user_id") String user_id, HttpServletRequest request){
+	    String token = request.getHeader(HEADER_STRING);
+	    String username = SecurityUtils.getUsernameByToken(token);
+	    
 		User u = userService.getUserById(user_id);
-		return new ResponseEntity<User>(u, HttpStatus.OK);
+		if(username.equals(u.getEmail())){
+			return new ResponseEntity<User>(u, HttpStatus.OK);	
+		}
+		else{
+			return new ResponseEntity(new BasicResponse("Not authorized to see the detail", "FAILED", ""), HttpStatus.OK);
+		}
 	}
-	
+
 	@PutMapping("/user/{user_id}")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity updateUserById(@RequestBody User user){
-		User u = userService.update(user);
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity updateUserById(@PathVariable("user_id") String user_id, @RequestBody User user){
+		User u = userService.update(user_id,user);
 		return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
 	}
-	
-	@DeleteMapping("/user/{user_id}")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity deleteUserById(@PathVariable("user_id") String user_id){
-		User u = userService.delete(user_id);
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is deleted", "SUCCESS", u.getEmail()), HttpStatus.OK);
-	}
-
-
-	@GetMapping("/user")
-	public @ResponseBody List<User> getAllUser(){
-		List<User> users = userService.getAllUsers();
-		return users;
-	}
-	
-	public User registerUser(User user, Role roles){
-		if(user.getBalance() == null){
-			user.setBalance(0L);
-		}
-		user.setEnable(true);
-		user.addRole(roles);
-		return userService.register(user);
-		
-	}
-	
-	@GetMapping("/all")
-	public ResponseEntity retrieveAllUser(){
-		return new ResponseEntity(userService.getAllUsers(), HttpStatus.OK);
-	}
-	
-
 }

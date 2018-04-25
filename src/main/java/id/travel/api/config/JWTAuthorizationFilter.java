@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.warungikan.db.model.User;
 
 import id.travel.api.service.IUserService;
+import id.travel.api.utils.SecurityUtils;
 import io.jsonwebtoken.Jwts;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
@@ -49,11 +50,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(SecurityConstants.HEADER_STRING);
         if (token != null) {
             // parse the token.
-            String user = Jwts.parser()
-                    .setSigningKey(SecurityConstants.SECRET)
-                    .parseClaimsJws(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
-                    .getBody()
-                    .getSubject();
+            String user = SecurityUtils.getUsernameByToken(token);
             if (user != null) {
             	UserDetails springUserDetails = userService.loadUserByUsername(user);
             	if (springUserDetails.getAuthorities() == null) throw new InsufficientAuthenticationException("User has no roles assigned");

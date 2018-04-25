@@ -38,47 +38,5 @@ public class TravelLauncher {
 	public static void main(String[] args) {
         SpringApplication.run(TravelLauncher.class, args);
 	}
-	
-//	@Bean
-//	public CommandLineRunner demo(UserRepository repository) {
-//		return (args) -> {
-//			User u = new User();
-//			u.setEmail("greg.laksono@gmail.com").setName("Gregory Laksono").setPassword("test");
-//			repository.save(u);
-//			
-//			u = repository.findOne(1L);
-//			log.info("----------RETRIEVE---------");
-//			log.info("Email:"+u.getEmail());
-//			log.info("Name:"+u.getName());
-//		};
-//	}
 
-//	@Bean
-//	@Autowired
-//	public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
-//	    HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-//	    vendorAdapter.setGenerateDdl(true);
-//
-//	    Properties jpaProperties = new Properties();
-//	    jpaProperties.setProperty("hibernate.show_sql", "true");
-//	    jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-//	    jpaProperties.setProperty("current_session_context_class", "thread");
-//
-//	    LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-//	    localContainerEntityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
-//	    localContainerEntityManagerFactoryBean.setPackagesToScan("org.warungikan.db.model");
-//	    localContainerEntityManagerFactoryBean.setDataSource(dataSource);
-//	    localContainerEntityManagerFactoryBean.setJpaProperties(jpaProperties);
-//	    localContainerEntityManagerFactoryBean.afterPropertiesSet();
-//
-//	    return localContainerEntityManagerFactoryBean.getObject();
-//	}
-//
-//	@Bean
-//	@Autowired
-//	public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-//	    JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-//	    jpaTransactionManager.setEntityManagerFactory(entityManagerFactory);
-//	    return jpaTransactionManager;
-//	}
 }

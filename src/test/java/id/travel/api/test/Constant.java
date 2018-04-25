@@ -30,8 +30,13 @@ public class Constant {
 	
 	public static final String WS_URL ="http://localhost:8888/";
 	public static final String WS_LOGIN_URL = WS_URL+"login";
-	public static final String WS_GET_ALL_USER_URL = WS_URL+"user";
-	public static final String WS_CREATE_USER_URL = WS_URL+"user/agent";
-	public static final String WS_CHECK_USER_URL = WS_URL+"user/";
-	public static final String WS_DELETE_USER_URL = WS_URL+"user/";
+	public static final String WS_GET_ALL_USER_URL = WS_URL+"admin/user";
+	public static final String WS_CREATE_USER_AGENT_URL = WS_URL+"admin/user/agent";
+	public static final String WS_CHECK_USER_AS_ADMIN_URL = WS_URL+"admin/user";
+	public static final String WS_UPDATE_USER_AGENT_URL = WS_URL+"admin/user";
+	public static final String WS_DELETE_USER_URL = WS_URL+"admin/user";
+	
+	public static final String WS_UPDATE_SELF_USER_URL = WS_URL+"/user";
+	public static final String WS_CHECK_USER_AS_USER_URL = WS_URL+"/user";
+	public static final String WS_CREATE_USER_CUSTOMER_URL = WS_URL+"admin/user/customer";
 }

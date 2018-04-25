@@ -1,5 +1,7 @@
 package id.travel.api.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -30,8 +32,13 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User register(User user) {
-		user.setCreationDate(new Date());
-		return userRepository.save(user);
+		if(!isUserIdExist(user.getEmail())){
+			user.setCreationDate(new Date());
+			return userRepository.save(user);			
+		}else{
+			return null;
+		}
+		
 	}
 
 	@Override
@@ -47,7 +54,7 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public List<User> getAllUsers() {
-		return userRepository.findAll();
+		return userRepository.findAllUsersEnabled();
 	}
 
 	@Override
@@ -70,9 +77,38 @@ public class UserServiceImpl implements IUserService{
 	}
 
 	@Override
-	public User update(User user) {
-		user.setLastModifiedDate(new Date());
-		return userRepository.save(user);
+	public User update(String user_id, User user) {
+		if(!isUserIdExist(user.getEmail())){
+			User u = userRepository.findUserByUserId(user_id);
+			u.setLastModifiedDate(new Date());
+			u.setAddress(user.getAddress());
+			u.setAddressInfo(user.getAddressInfo());
+			u.setCity(user.getCity());
+			u.setEmail(user.getEmail());
+			u.setEnable(user.getEnable());
+			u.setLatitude(user.getLatitude());
+			u.setLongitude(user.getLongitude());
+			u.setName(user.getName());
+			u.setPassword(user.getPassword());
+			u.setRoles(getRoles(user.getRoles()));
+			u.setTelpNo(user.getTelpNo());
+			return userRepository.save(u);			
+		}
+		return null;
+	}
+	
+	private List<Role> getRoles(Collection<Role> roles){
+		List<Role> r = new ArrayList();
+		for(Role s : roles){
+			Role role = roleRepository.findByName(s.getName());
+			r.add(role);
+		}
+		return r;
+	}
+	
+	private boolean isUserIdExist(String user_id){
+		User u = userRepository.findUserByUserId(user_id);
+		return (u != null);
 	}
 
 	@Override
@@ -81,9 +117,11 @@ public class UserServiceImpl implements IUserService{
 		if(user != null) {
 			user.setEnable(false);
 			user.setLastModifiedDate(new Date());			
+			return userRepository.save(user);
 		}
 		
-		return userRepository.save(user);
+		return null;
+		
 	}
 
 

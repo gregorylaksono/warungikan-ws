@@ -34,7 +34,6 @@ import id.travel.api.test.exception.WarungIkanNetworkException;
 @Service
 public class UserManagerImpl  {
 	
-	String sessionId = null;
 
 	public String login(String username, String password)throws UserSessionException,WarungIkanNetworkException{
 		String jwt = null;
@@ -48,14 +47,13 @@ public class UserManagerImpl  {
 			if(response.getStatusCodeValue() == 401){
 				throw new UserSessionException("Could not identified user");
 			}
-			sessionId = response.getHeaders().getFirst("Authorization");
 			return response.getHeaders().getFirst("Authorization");
 		} catch (Exception e) {
 			throw new WarungIkanNetworkException("Could not connect to server");
 		}
 	}
 
-	public List<User> getAllUsers() throws UserSessionException,WarungIkanNetworkException{
+	public List<User> getAllUsers(String sessionId) throws UserSessionException,WarungIkanNetworkException{
 		try {
 			RestTemplate r = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
@@ -77,8 +75,7 @@ public class UserManagerImpl  {
 	public static void main(String[] args) throws TimeoutException {
 	
 	}
-
-	public Integer createUser(String name, String email, String telNo, String address, String city, String latitude,
+	public Integer createUserCustomer(String sessionId,String name, String email, String telNo, String address, String city, String latitude,
 			String longitude, String password) throws UserSessionException,WarungIkanNetworkException{
 		try {
 		User u = User.UserFactory(name, email, telNo, address, city, latitude, longitude, password);
@@ -86,7 +83,7 @@ public class UserManagerImpl  {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", sessionId);
 		HttpEntity request = new HttpEntity<>(u, headers);
-		ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_URL), request, BasicResponse.class);
+		ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_CUSTOMER_URL), request, BasicResponse.class);
 		return response.getStatusCodeValue();
 		} catch (Exception e) {
 			if((e instanceof HttpClientErrorException) || (e instanceof HttpServerErrorException)){
@@ -97,18 +94,37 @@ public class UserManagerImpl  {
 		}
 		return null;
 	}
-	public Integer updateUser(Long id, String name, String email, String telNo, String address, String city, String latitude,
+	public Integer createUserAgent(String sessionId,String name, String email, String telNo, String address, String city, String latitude,
+			String longitude, String password) throws UserSessionException,WarungIkanNetworkException{
+		try {
+		User u = User.UserFactory(name, email, telNo, address, city, latitude, longitude, password);
+		RestTemplate r = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", sessionId);
+		HttpEntity request = new HttpEntity<>(u, headers);
+		ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_AGENT_URL), request, BasicResponse.class);
+		return response.getStatusCodeValue();
+		} catch (Exception e) {
+			if((e instanceof HttpClientErrorException) || (e instanceof HttpServerErrorException)){
+				throw new UserSessionException("token is wrong");
+			}else if(e instanceof ResourceAccessException){
+				throw new WarungIkanNetworkException("Could not connect to server");
+			}
+		}
+		return null;
+	}
+	public Integer updateAgentAsAdmin(String sessionId,String name, String email,String emailNew, String telNo, String address, String city, String latitude,
 			String longitude) throws UserSessionException,WarungIkanNetworkException{
 		try {
-		User u = getSingleUser(email);
-		u.setName(name).setEmail(email).setTelpNo(telNo).setAddress(address).
+		User u = getSingleUserAsAdmin(sessionId, email);
+		u.setName(name).setEmail(emailNew).setTelpNo(telNo).setAddress(address).
 		setCity(city).setLatitude(Double.parseDouble(latitude)).setLongitude(Double.parseDouble(longitude));
 		
 		RestTemplate r = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", sessionId);
 		HttpEntity request = new HttpEntity<>(u, headers);
-		ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_URL), request, BasicResponse.class);
+		ResponseEntity<BasicResponse> response = r.exchange(new URI(Constant.WS_UPDATE_USER_AGENT_URL+"/"+email),HttpMethod.PUT, request, BasicResponse.class);
 		return response.getStatusCodeValue();
 		
 		} catch (Exception e) {
@@ -120,14 +136,16 @@ public class UserManagerImpl  {
 		}
 		return null;
 	}
+
 	
-	public User getSingleUser(String email) throws UserSessionException,WarungIkanNetworkException{
+	
+	public User getSingleUserAsAdmin(String sessionId,String email) throws UserSessionException,WarungIkanNetworkException{
 		try {
 			RestTemplate r = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(headers);
-			ResponseEntity<User> response = r.exchange(new URI(Constant.WS_CHECK_USER_URL+email),HttpMethod.GET, request, User.class);
+			ResponseEntity<User> response = r.exchange(new URI(Constant.WS_CHECK_USER_AS_ADMIN_URL+"/"+email),HttpMethod.GET, request, User.class);
 			if(response.getStatusCode() == HttpStatus.OK){
 				return response.getBody();
 			}
@@ -141,14 +159,15 @@ public class UserManagerImpl  {
 		}
 		return null;
 	}
+
 	
-	public Boolean checkUserIdExist(String userId)  throws UserSessionException,WarungIkanNetworkException{
+	public Boolean deleteUser(String sessionId,String userId)  throws UserSessionException,WarungIkanNetworkException{
 		try {
 			RestTemplate r = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(headers);
-			ResponseEntity<BasicResponse> response = r.exchange(new URI(Constant.WS_CHECK_USER_URL+userId),HttpMethod.GET, request, BasicResponse.class);
+			ResponseEntity<BasicResponse> response = r.exchange(new URI(Constant.WS_CHECK_USER_AS_ADMIN_URL+"/"+userId),HttpMethod.DELETE, request, BasicResponse.class);
 			if(response.getBody().getInfo() != null){
 				return true;
 			}
@@ -163,13 +182,15 @@ public class UserManagerImpl  {
 		return false;
 	}
 	
-	public Boolean deleteUser(String userId)  throws UserSessionException,WarungIkanNetworkException{
+// USER_ROLE SECTION
+	
+	public Boolean checkUserIdExist(String sessionId,String userId)  throws UserSessionException,WarungIkanNetworkException{
 		try {
 			RestTemplate r = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(headers);
-			ResponseEntity<BasicResponse> response = r.exchange(new URI(Constant.WS_CHECK_USER_URL+userId),HttpMethod.DELETE, request, BasicResponse.class);
+			ResponseEntity<BasicResponse> response = r.exchange(new URI(Constant.WS_CHECK_USER_AS_USER_URL+"/"+userId),HttpMethod.GET, request, BasicResponse.class);
 			if(response.getBody().getInfo() != null){
 				return true;
 			}
@@ -184,8 +205,30 @@ public class UserManagerImpl  {
 		return false;
 	}
 
-
-
+	public Integer updateUserData(String sessionId,Long id, String name, String email, String telNo, String address, String city, String latitude,
+			String longitude) throws UserSessionException,WarungIkanNetworkException{
+		try {
+		User u = getSingleUserAsAdmin(sessionId, email);
+		u.setName(name).setEmail(email).setTelpNo(telNo).setAddress(address).
+		setCity(city).setLatitude(Double.parseDouble(latitude)).setLongitude(Double.parseDouble(longitude));
+		
+		RestTemplate r = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", sessionId);
+		HttpEntity request = new HttpEntity<>(u, headers);
+		ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_UPDATE_SELF_USER_URL), request, BasicResponse.class);
+		return response.getStatusCodeValue();
+		
+		} catch (Exception e) {
+			if((e instanceof HttpClientErrorException) || (e instanceof HttpServerErrorException)){
+				throw new UserSessionException("token is wrong");
+			}else if(e instanceof ResourceAccessException){
+				throw new WarungIkanNetworkException("Could not connect to server");
+			}
+		}
+		return null;
+	}
+	
 
 
 }
