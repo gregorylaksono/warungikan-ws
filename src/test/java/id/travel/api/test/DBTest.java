@@ -31,20 +31,44 @@ import org.warungikan.db.repository.UserRepository;
 
 import id.travel.api.TravelLauncher;
 import id.travel.api.service.IUserService;
+import id.travel.api.test.exception.UserSessionException;
+import id.travel.api.test.exception.WarungIkanNetworkException;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= TravelLauncher.class)
 @AutoConfigureTestDatabase(replace=Replace.NONE)
 @Transactional
 public class DBTest {
-
-	
 	
 	@Autowired
 	IUserService userService;
-
+	
+	@Autowired
+	UserManagerImpl userManager;
 
 	@Test
 	public void test(){
+		try {
+			userManager.login("greg.laksono@gmail.com", "gregory1234");
+			int status = userManager.createUser("user1", "email1", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+			
+			
+			Assert.assertEquals(status, 200);
+			User u = userManager.getSingleUser("email1");
+			Assert.assertNotNull(u);
+			Assert.assertEquals("email1",u.getEmail());
+			
+			
+			userManager.login(username, password)
+			Boolean isDeleted = userManager.deleteUser("email1");
+			Assert.assertNotNull(isDeleted);
+			Assert.assertTrue(isDeleted);
+			userManager.login("email1", "testpassword");
+			u = userManager.getSingleUser("email1");
+			Assert.assertNull(u);
+			
+		} catch (UserSessionException | WarungIkanNetworkException e) {
+			Assert.fail();
+		}
 		List<User> all = userService.getAllUsers();
 		all.size();
 	}

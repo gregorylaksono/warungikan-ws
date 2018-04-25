@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +35,7 @@ public class UserController {
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@PostMapping("/user/{type}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity registerCustomer(@RequestBody User user,@PathVariable("type") String type){
 		
 		Role roles = null;
@@ -50,16 +53,25 @@ public class UserController {
 	}
 	
 	@GetMapping("/user/{user_id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity checkUserId(@PathVariable("user_id") String user_id){
 		
 		User u = userService.getUserById(user_id);
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is exist", "SUCCESS", u.getEmail()), HttpStatus.OK);
+		return new ResponseEntity<User>(u, HttpStatus.OK);
 	}
 	
 	@PutMapping("/user/{user_id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity updateUserById(@RequestBody User user){
 		User u = userService.update(user);
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/user/{user_id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity deleteUserById(@PathVariable("user_id") String user_id){
+		User u = userService.delete(user_id);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("User is deleted", "SUCCESS", u.getEmail()), HttpStatus.OK);
 	}
 
 

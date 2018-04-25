@@ -75,5 +75,16 @@ public class UserServiceImpl implements IUserService{
 		return userRepository.save(user);
 	}
 
+	@Override
+	public User delete(String email) {
+		User user = userRepository.findUserByUserId(email);
+		if(user != null) {
+			user.setEnable(false);
+			user.setLastModifiedDate(new Date());			
+		}
+		
+		return userRepository.save(user);
+	}
+
 
 }

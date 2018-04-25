@@ -15,6 +15,8 @@ public class BasicResponse implements Serializable{
 		setCode(code);
 		setInfo(info);
 	}
+	
+	public BasicResponse() {}
 	public String getMessage() {
 		return message;
 	}

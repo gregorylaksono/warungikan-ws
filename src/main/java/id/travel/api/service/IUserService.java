@@ -16,4 +16,5 @@ public interface IUserService {
 	public User getUserById(String userId);
 	public void setAvailableUser(String userId, Boolean enabled);
 	public User update(User user);
+	public User delete(String user_id);
 }
