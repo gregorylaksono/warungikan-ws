@@ -39,6 +39,7 @@ public class UserServiceImpl implements IUserService{
 		if(!isUserIdExist(user.getEmail())){
 			user.setCreationDate(new Date());
 			user.setEnable(true);
+			user.setBalance(0l);
 			return userRepository.save(user);			
 		}else{
 			return null;

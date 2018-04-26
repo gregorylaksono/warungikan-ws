@@ -90,6 +90,7 @@ public class AdminController {
 
 
 	@GetMapping("/user")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public @ResponseBody List<User> getAllUser(){
 		List<User> users = userService.getAllUsers();
 		return users;
@@ -103,7 +104,6 @@ public class AdminController {
 		user.addRole(roles);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		return userService.register(user);
-		
 	}
 	
 	@GetMapping("/all")

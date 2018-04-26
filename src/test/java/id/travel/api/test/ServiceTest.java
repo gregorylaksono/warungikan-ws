@@ -29,10 +29,11 @@ public class ServiceTest {
 		User u = User.UserFactory("testname", "email1", "122344", "adres", "ccity", "2.993019", "4.2271113", "test");
 		Role role = userService.getRoleByName("ROLE_USER");
 		u.addRole(role);
-		u.setBalance(0L);
-		User customer =userService.register(u);
+		User customer = userService.register(u);
 		Boolean topupSuccess = userService.addBalance(u.getEmail(), 100000L);
 		Assert.assertNotNull(customer);
 		Assert.assertTrue(topupSuccess);
+		u = userService.getUserById("email1");
+		Assert.assertEquals((Long)100000L, u.getBalance());
 	}
 }
