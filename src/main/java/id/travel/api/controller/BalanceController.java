@@ -27,9 +27,8 @@ public class BalanceController {
 	
 	@PostMapping("/user/{user_id}/{balance}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity addBalanceUser(@PathVariable("user_id") String user_id,
-											@PathVariable("balance") String balance){
-		
+	public ResponseEntity addBalanceUser(@PathVariable( value = "user_id", required = true) String user_id,
+										 @PathVariable(value = "balance", required = true) String balance){
 		Long bal = null;
 		try{
 			bal = Long.parseLong(balance);

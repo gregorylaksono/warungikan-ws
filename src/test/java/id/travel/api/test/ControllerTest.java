@@ -25,7 +25,7 @@ import org.warungikan.db.model.User;
 import org.warungikan.db.repository.ShopItemRepository;
 import org.warungikan.db.repository.ShopItemStockRepository;
 import org.warungikan.db.repository.TopupWalletRepository;
-import org.warungikan.db.repository.TransactionDetailRepository;
+import org.warungikan.db.repository.TransactionStateRepository;
 import org.warungikan.db.repository.TransactionRepository;
 import org.warungikan.db.repository.UserRepository;
 

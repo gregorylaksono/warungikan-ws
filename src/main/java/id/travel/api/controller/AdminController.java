@@ -39,9 +39,10 @@ public class AdminController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	@PostMapping("/user/{type}")
+	@PostMapping("/user/{type}/{price_per_km}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity registerCustomer(@RequestBody User user,@PathVariable("type") String type){
+	public ResponseEntity register(@RequestBody User user,@PathVariable( value = "type", required = true) String type,
+									@PathVariable("price_per_km") String price_per_km){
 		
 		Role roles = null;
 		if(type.equalsIgnoreCase("admin")){
@@ -50,10 +51,8 @@ public class AdminController {
 		else if (type.equalsIgnoreCase("agent")){
 			roles = userService.getRoleByName("ROLE_AGENT");
 		}
-		else {
-			roles = userService.getRoleByName("ROLE_USER");
-		}
-		User u = registerUser(user, roles);
+		
+		User u = registerUser(user,price_per_km, roles);
 		if(u != null){
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
 		}
@@ -64,7 +63,7 @@ public class AdminController {
 	
 	@GetMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity checkUserId(@PathVariable("user_id") String user_id){
+	public ResponseEntity checkUserId(@PathVariable(value = "user_id",required = true) String user_id){
 		
 		User u = userService.getUserById(user_id);
 		return new ResponseEntity<User>(u, HttpStatus.OK);
@@ -72,7 +71,7 @@ public class AdminController {
 	
 	@PutMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity updateUserById(@RequestBody User user, @PathVariable("user_id") String user_id){
+	public ResponseEntity updateUserById(@RequestBody User user, @PathVariable(value = "user_id", required = true) String user_id){
 		User u = userService.update(user_id,user);
 		if(u!=null){
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
@@ -83,7 +82,7 @@ public class AdminController {
 	
 	@DeleteMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity deleteUserById(@PathVariable("user_id") String user_id){
+	public ResponseEntity deleteUserById(@PathVariable(value = "user_id", required = true) String user_id){
 		User u = userService.delete(user_id);
 		return new ResponseEntity<BasicResponse>(new BasicResponse("User is deleted", "SUCCESS", u.getEmail()), HttpStatus.OK);
 	}
@@ -96,14 +95,14 @@ public class AdminController {
 		return users;
 	}
 	
-	public User registerUser(User user, Role roles){
+	public User registerUser(User user, String price_per_km, Role roles){
 		if(user.getBalance() == null){
 			user.setBalance(0L);
 		}
 		user.setEnable(true);
 		user.addRole(roles);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		return userService.register(user);
+		return userService.registerAgentOrAdmin(user, price_per_km);
 	}
 	
 	@GetMapping("/all")

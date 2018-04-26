@@ -40,4 +40,7 @@ public class Constant {
 	public static final String WS_CHECK_USER_AS_USER_URL = WS_URL+"user";
 	public static final String WS_CREATE_USER_CUSTOMER_URL = WS_URL+"admin/user/customer";
 	public static final String WS_UPDATE_CHANGE_PWD_URL = WS_URL+"user/change_password";
+	
+	public static final String AGENT_DATA_KEY_PRICE_PER_KM = "price_per_km";
+	
 }

@@ -39,9 +39,21 @@ public class UserController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
+	@PostMapping("/user/{type}")
+	public ResponseEntity register(@RequestBody User user){
+		
+		User u = userService.registerUser(user);
+		if(u != null){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
+		}
+		else{
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User with id exists alread", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@GetMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity getMyData(@PathVariable("user_id") String user_id, HttpServletRequest request){
+	public ResponseEntity getMyData(@PathVariable(value = "user_id", required=true) String user_id, HttpServletRequest request){
 	    String token = request.getHeader(HEADER_STRING);
 	    String username = SecurityUtils.getUsernameByToken(token);
 	    
@@ -56,14 +68,14 @@ public class UserController {
 
 	@PutMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity updateUserById(@PathVariable("user_id") String user_id, @RequestBody User user){
+	public ResponseEntity updateUserById(@PathVariable(value = "user_id", required = true) String user_id, @RequestBody User user){
 		User u = userService.update(user_id,user);
 		return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
 	}
 	
 	@PutMapping("/user/change_password/{user_id}")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity changePassword(@PathVariable("user_id") String user_id, @RequestBody ChangePassword chPassword){
+	public ResponseEntity changePassword(@PathVariable(value = "user_id", required = true) String user_id, @RequestBody ChangePassword chPassword){
 		Boolean result = userService.changePassword(user_id, chPassword.getPassword(),
 				passwordEncoder.encode(chPassword.getNewPassword()));
 		if(result){

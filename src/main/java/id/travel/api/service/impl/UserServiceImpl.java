@@ -3,18 +3,25 @@ package id.travel.api.service.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.TopupWalletHistory;
 import org.warungikan.db.model.User;
+import org.warungikan.db.repository.AgentDataRepository;
 import org.warungikan.db.repository.RoleRepository;
 import org.warungikan.db.repository.TopupWalletRepository;
 import org.warungikan.db.repository.UserRepository;
 
+import com.google.gson.Gson;
+
 import id.travel.api.service.IUserService;
+import id.travel.api.test.Constant;
 
 @Service
 public class UserServiceImpl implements IUserService{
@@ -28,6 +35,9 @@ public class UserServiceImpl implements IUserService{
 	@Autowired
 	private TopupWalletRepository topUpWalletRepository;
 	
+	@Autowired
+	private AgentDataRepository agentDataRepository;
+	
 	@Override
 	public User login(String email, String password) {
 		
@@ -35,12 +45,23 @@ public class UserServiceImpl implements IUserService{
 	}
 
 	@Override
-	public User register(User user) {
+	public User registerAgentOrAdmin(User user, String pricePerKm) {
 		if(!isUserIdExist(user.getEmail())){
 			user.setCreationDate(new Date());
 			user.setEnable(true);
 			user.setBalance(0l);
-			return userRepository.save(user);			
+			user = userRepository.save(user);
+			if(pricePerKm != null){
+				Long.parseLong(pricePerKm);
+				AgentData d = new AgentData();
+				Map<String, String> data = new HashMap<>();
+				data.put(Constant.AGENT_DATA_KEY_PRICE_PER_KM, pricePerKm);
+				String json = new Gson().toJson(data);
+				d.setData(json);
+				d.setAgent(user);
+				agentDataRepository.save(d);
+			}
+			return user;
 		}else{
 			return null;
 		}
@@ -156,6 +177,29 @@ public class UserServiceImpl implements IUserService{
 			return true;
 		}
 		return true;
+	}
+
+	@Override
+	public User registerUser(User user) {
+		Role r = getRoleByName("ROLE_USER");
+		
+		user.setBalance(0l).addRole(r).
+		setEnable(true).setCreationDate(new Date());
+		
+		return userRepository.save(user);
+	}
+
+	@Override
+	public Long getPricePerKm(String agent_id) {
+		User u = userRepository.findUserByUserId(agent_id);
+		AgentData data =agentDataRepository.findDataByUser(u);
+		if(data != null){
+			Map m = new Gson().fromJson(data.getData(), Map.class);
+			String sAgentRate = String.valueOf( m.get(Constant.AGENT_DATA_KEY_PRICE_PER_KM));
+			return Long.parseLong(sAgentRate);
+		}else{
+			return null;
+		}
 	}
 
 
