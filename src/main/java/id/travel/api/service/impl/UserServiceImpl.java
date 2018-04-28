@@ -45,11 +45,13 @@ public class UserServiceImpl implements IUserService{
 	}
 
 	@Override
-	public User registerAgentOrAdmin(User user, String pricePerKm) {
+	public User registerUser(User user,List<String> roles, String pricePerKm) {
 		if(!isUserIdExist(user.getEmail())){
+			List<Role> rolesDb = roleRepository.findRolesByArrayName(roles);
 			user.setCreationDate(new Date());
 			user.setEnable(true);
 			user.setBalance(0l);
+			user.addAllRole(rolesDb);
 			user = userRepository.save(user);
 			if(pricePerKm != null){
 				Long.parseLong(pricePerKm);

@@ -9,7 +9,7 @@ import org.warungikan.db.model.User;
 public interface IUserService {
 
 	public User login(String email, String password);
-	public User registerAgentOrAdmin(User user, String price_per_km);
+	public User registerUser(User user,List<String> roles, String price_per_km);
 	public User generateUserId();
 	public List<User> getAllAgents();
 	public List<User> getAllUsers();

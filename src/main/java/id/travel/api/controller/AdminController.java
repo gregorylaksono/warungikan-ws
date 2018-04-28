@@ -2,6 +2,7 @@ package id.travel.api.controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -96,13 +97,8 @@ public class AdminController {
 	}
 	
 	public User registerUser(User user, String price_per_km, Role roles){
-		if(user.getBalance() == null){
-			user.setBalance(0L);
-		}
-		user.setEnable(true);
-		user.addRole(roles);
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		return userService.registerAgentOrAdmin(user, price_per_km);
+				user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return userService.registerUser(user, Arrays.asList(new String[]{roles.getName()}), price_per_km);
 	}
 	
 	@GetMapping("/all")

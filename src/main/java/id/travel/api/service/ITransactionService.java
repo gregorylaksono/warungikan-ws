@@ -9,12 +9,48 @@ import org.warungikan.db.model.TransactionState;
 
 public interface ITransactionService {
 
+	//Agent, Customer
+	public Transaction checkTransaction(String customer_id, String agent_id, String totalKm, Set<TransactionDetail> details);
+	
+	//Customer
 	public Transaction addTransaction(String customer_id, String agent, Set<TransactionDetail> details, Long transportPrice);
+	
+	//Customer
 	public List<Transaction> getTransactionCustomer(String user_id);
+	
+	//Customer, Agent
 	public List<TransactionState> getTransactionStateByTransaction(Long oid);
-	public Transaction markTransactionAsPaid(Long trxId);
-	public Transaction markTransactionAsProcessing(Long trxId);
-	public Transaction markTransactionAsDelivering(Long trxId);
-	public Transaction markTransactionAsReceiving(Long trxId);
-	public Transaction cancelTransaction(Long trxId);
+	
+	//Agent
+	public List<Transaction> getTransactionAgent(String user_id);
+	
+	//Customer
+	public TransactionState markTransactionAsPaid(Long trxId);
+	
+	//Agent
+	public TransactionState markTransactionAsProcessing(Long trxId);
+	
+	//Agent
+	public TransactionState markTransactionAsDelivering(Long trxId);
+	
+	//Customer
+	public TransactionState markTransactionAsReceiving(Long trxId);
+	
+	//Admin
+	public TransactionState cancelTransaction(Long trxId);
+	
+	//Customer
+	public Long calculateBalanceCustomer(String user_id);
+	
+	//Agent
+	public Long calculateBalanceAgent(String user_id);
+	
+	//Agent, Customer, Admin 
+	public List<TransactionState> getTransactionState(String trxId);
+	
+	//Agent, Customer
+	public Long calculateTransportPrice(String customer_id, String agent_id);
+	
+	//Customer
+	public Boolean isCustomerLegitimateForTransaction(String customer_id, String agent, String totalKm, Set<TransactionDetail> details);
 }
