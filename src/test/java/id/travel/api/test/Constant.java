@@ -28,7 +28,7 @@ public class Constant {
 	public static final String TOKEN_PREFIX = "Bearer ";
 	
 	
-	public static final String WS_URL ="http://localhost:8888/";
+	public static final String WS_URL = "http://localhost:8888/";
 	public static final String WS_LOGIN_URL = WS_URL+"login";
 	public static final String WS_GET_ALL_USER_URL = WS_URL+"admin/user";
 	public static final String WS_CREATE_USER_AGENT_URL = WS_URL+"admin/user/agent";
@@ -39,8 +39,29 @@ public class Constant {
 	public static final String WS_UPDATE_SELF_USER_URL = WS_URL+"user";
 	public static final String WS_CHECK_USER_AS_USER_URL = WS_URL+"user";
 	public static final String WS_CREATE_USER_CUSTOMER_URL = WS_URL+"admin/user/customer";
-	public static final String WS_UPDATE_CHANGE_PWD_URL = WS_URL+"user/change_password";
-	
+	public static final String WS_UPDATE_CHANGE_PWD_URL = WS_URL+"user/change_password";	
 	public static final String AGENT_DATA_KEY_PRICE_PER_KM = "price_per_km";
+	
+	
+	public static final String WS_POST_ADD_BALANCE_URL = WS_URL+"transaction/balance";
+	public static final String WS_POST_CHECK_TRANSCTION_URL = WS_URL+"transaction/check";
+	public static final String WS_POST_ADD_TRANSCTION_URL = WS_URL+"transaction";
+	public static final String WS_GET_TRANSCTION_CUSTOMER_URL = WS_URL+"transaction/customer";
+	public static final String WS_GET_TRANSCTION_AGENT_URL = WS_URL+"transaction/agent";
+	public static final String WS_GET_TRANSCTION_STATE_URL = WS_URL+"transaction/state";
+	public static final String WS_POST_TRANSCTION_MARK_PAID_URL = WS_URL+"transaction/mark_paid";
+	public static final String WS_POST_TRANSCTION_MARK_PROCESSING_URL = WS_URL+"transaction/mark_processing";
+	public static final String WS_POST_TRANSCTION_MARK_DELIVERING_URL = WS_URL+"transaction/mark_delivering";
+	public static final String WS_POST_TRANSCTION_MARK_RECEIVING_URL = WS_URL+"transaction/mark_receiving";
+	public static final String WS_POST_TRANSCTION_MARK_CANCEL_URL = WS_URL+"transaction/mark_receiving";
+	public static final String WS_GET_TRANSCTION_BALANCE_CUSTOMER_URL = WS_URL+"transaction/balance/customer";
+	public static final String WS_GET_TRANSCTION_BALANCE_AGENT_URL = WS_URL+"transaction/balance/agent";
+	public static final String WS_GET_TRANSACTION_CALC_TRANSPORT_URL = WS_URL+"transaction/transport_price";
+	public static final String WS_POST_TRANSCTION_IS_LEGIT_URL = WS_URL+"transaction/is_legit";
+	
+	public static final String WS_POST_CREATE_SHOP_ITEM_URL = WS_URL+"shop/item";
+	public static final String WS_PUT_UPDATE_SHOP_ITEM_URL = WS_URL+"shop/item";
+	public static final String WS_PUT_GET_STOCK_URL = WS_URL+"shop/stock";
+	public static final String WS_PUT_POST_STOCK_URL = WS_URL+"shop/stock";
 	
 }

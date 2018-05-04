@@ -1,4 +1,4 @@
-package id.travel.api.test;
+package id.travel.api.test.manager;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import id.travel.api.model.BasicResponse;
 import id.travel.api.model.ChangePassword;
+import id.travel.api.test.Constant;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
 

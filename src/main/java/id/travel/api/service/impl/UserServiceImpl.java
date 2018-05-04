@@ -169,16 +169,18 @@ public class UserServiceImpl implements IUserService{
 	public Boolean addBalance(String user_id, Long amount) {
 		User u = userRepository.findUserByUserId(user_id);
 		if(u!=null){
-			TopupWalletHistory t = new TopupWalletHistory();
-			t.setAmount(amount);
-			t.setUser(u);
-			t.setCreationDate(new Date());
-			u.setBalance(u.getBalance() + amount);
-			topUpWalletRepository.save(t);
-			userRepository.save(u);
-			return true;
+			if(u.getRoles().contains("ROLE_USER")) {
+				TopupWalletHistory t = new TopupWalletHistory();
+				t.setAmount(amount);
+				t.setUser(u);
+				t.setCreationDate(new Date());
+				u.setBalance(u.getBalance() + amount);
+				topUpWalletRepository.save(t);
+				userRepository.save(u);
+				return true;
+			}
 		}
-		return true;
+		return false;
 	}
 
 	@Override

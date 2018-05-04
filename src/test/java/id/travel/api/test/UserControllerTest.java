@@ -33,11 +33,12 @@ import id.travel.api.TravelLauncher;
 import id.travel.api.service.IUserService;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
+import id.travel.api.test.manager.UserManagerImpl;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= TravelLauncher.class)
 @AutoConfigureTestDatabase(replace=Replace.NONE)
 @Transactional
-public class ControllerTest {
+public class UserControllerTest {
 
 	@Autowired
 	IUserService userService;
