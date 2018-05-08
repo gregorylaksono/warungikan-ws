@@ -1,5 +1,6 @@
 package id.travel.api.test.controller;
 
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
@@ -7,12 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.warungikan.api.TravelLauncher;
+import org.warungikan.db.model.ShopItem;
 
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
+import id.travel.api.test.manager.ShopItemManagerImpl;
 import id.travel.api.test.manager.TransactionManagerImpl;
 import id.travel.api.test.manager.UserManagerImpl;
-import junit.framework.Assert;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= TravelLauncher.class)
@@ -23,6 +25,8 @@ public class TransactionControllerTest {
 	public void trxControllerTest() {
 		UserManagerImpl userManager = new UserManagerImpl();
 		TransactionManagerImpl trxManager = new TransactionManagerImpl();
+		ShopItemManagerImpl shopItemManager = new ShopItemManagerImpl();
+		
 		String customerUserId =  "gregtest@email.com";
 		String agentUserId = "agentgreg@email.com";
 		try {
@@ -44,6 +48,23 @@ public class TransactionControllerTest {
 			//Create agent
 			Integer agentCreated = userManager.createUserAgent(adminJwt, "agentgreg", agentUserId , "222334422", "agentaddress", "city", "-9.12344", "3.22123", "agentpassword");
 			String agentJwt = userManager.login(agentUserId, "agentpassword");
+			Assert.assertNotNull(agentJwt);
+			
+			//Create shop item
+			ShopItem shopItem1 = shopItemManager.createShopItem(adminJwt, "item1", "itemdescription", "http://url.com", "50000");
+			ShopItem shopItem2 = shopItemManager.createShopItem(adminJwt, "item2", "itemdescription", "http://url.com", "50000");
+			Assert.assertNotNull(shopItem1);
+			Assert.assertNotNull(shopItem2);
+			
+			Assert.assertEquals("item1", shopItem1.getName());
+			Assert.assertEquals("itemdescription", shopItem1.getDescription());
+			Assert.assertEquals("http://url.com", shopItem1.getUrl());
+			Assert.assertEquals(new Long("50000").longValue(), shopItem1.getPrice().longValue());
+			
+			Assert.assertEquals("item2", shopItem2.getName());
+			Assert.assertEquals("itemdescription", shopItem2.getDescription());
+			Assert.assertEquals("http://url.com", shopItem2.getUrl());
+			Assert.assertEquals(new Long("50000").longValue(), shopItem2.getPrice().longValue());
 			
 		} catch (UserSessionException | WarungIkanNetworkException e) {
 			// TODO Auto-generated catch block
