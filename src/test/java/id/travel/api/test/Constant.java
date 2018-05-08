@@ -59,6 +59,7 @@ public class Constant {
 	public static final String WS_GET_TRANSACTION_CALC_TRANSPORT_URL = WS_URL+"transaction/transport_price";
 	public static final String WS_POST_TRANSCTION_IS_LEGIT_URL = WS_URL+"transaction/is_legit";
 	
+	public static final String WS_GET_GET_SHOP_ITEM_URL = WS_URL+"shop/item";
 	public static final String WS_POST_CREATE_SHOP_ITEM_URL = WS_URL+"shop/item";
 	public static final String WS_PUT_UPDATE_SHOP_ITEM_URL = WS_URL+"shop/item";
 	public static final String WS_PUT_GET_STOCK_URL = WS_URL+"shop/stock";

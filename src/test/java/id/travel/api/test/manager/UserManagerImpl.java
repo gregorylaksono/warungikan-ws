@@ -23,12 +23,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.warungikan.api.model.BasicResponse;
+import org.warungikan.api.model.ChangePassword;
 import org.warungikan.db.model.User;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import id.travel.api.model.BasicResponse;
-import id.travel.api.model.ChangePassword;
 import id.travel.api.test.Constant;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
