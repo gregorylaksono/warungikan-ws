@@ -16,6 +16,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.warungikan.api.TravelLauncher;
+import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.IShopItemService;
 import org.warungikan.api.service.ITransactionService;
 import org.warungikan.api.service.IUserService;
@@ -44,18 +45,52 @@ public class ServiceTest {
 	@Autowired
 	ITransactionService transactionService;
 	
-//	@Test
-//	public void addBalance(){
-//		User u = User.UserFactory("testname", "customer1", "122344", "adress", "ccity", "2.993019", "4.2271113", "test");
-//		User customer = userService.registerUser(u, Arrays.asList(new String[]{"ROLE_USER"}), null);
-//		Boolean topupSuccess = userService.addBalance(u.getEmail(), 100000L);
-//		Assert.assertNotNull(customer);
-//		Assert.assertTrue(topupSuccess);
-//		u = userService.getUserById("email1");
-//		Assert.assertEquals((Long)100000L, u.getBalance());
-//	}
 	@Test
-	@Rollback(true)
+	public void getAgentsByUserLocation(){
+		User customer = User.UserFactory("agent", "userEmail", "telpNo", "address", "city", "-6.262776", "106.829766", "passw");
+		User agent = User.UserFactory("customer", "agent1@mail.com", "3333", "213342", "addd", "-6.229885", "106.833500", "pwd");
+		customer = userService.registerUser(customer);
+		agent = userService.registerUser(agent, Arrays.asList(new String[] {"ROLE_USER","ROLE_AGENT"}), "3000");
+		
+		User agent2 = User.UserFactory("agent2", "agent2@mail.com", "33322", "5555", "city", "-6.193074", "106.889019", "pass");
+		agent2 = userService.registerUser(agent2, Arrays.asList(new String[] {"ROLE_USER","ROLE_AGENT"}), "3000");
+		
+		User agent3 = User.UserFactory("agent3", "agent3@mail.com", "33322", "5555", "city", "-6.200792", "106.815811", "pass");
+		agent3 = userService.registerUser(agent3, Arrays.asList(new String[] {"ROLE_USER","ROLE_AGENT"}), "3000");
+		
+		ShopItem item1 = shopItemService.createShopItem("item1", "item1desc", "http://sdsdas", "50000");
+		ShopItem item2 = shopItemService.createShopItem("item2", "item2desc", "http://sdsdas", "60000");
+		ShopItem item3 = shopItemService.createShopItem("item2", "item2desc", "http://sdsdas", "40000");
+		
+		ShopItemStock stock1 = shopItemService.addStock(String.valueOf(item1.getId()), agent.getEmail(), new Integer("5"));
+		ShopItemStock stock2 = shopItemService.addStock(String.valueOf(item2.getId()), agent.getEmail(), new Integer("10"));
+		ShopItemStock stock3 = shopItemService.addStock(String.valueOf(item3.getId()), agent.getEmail(), new Integer("7"));
+		
+		ShopItemStock stock1a = shopItemService.addStock(String.valueOf(item1.getId()), agent2.getEmail(), new Integer("5"));
+		ShopItemStock stock1b = shopItemService.addStock(String.valueOf(item2.getId()), agent2.getEmail(), new Integer("5"));
+		
+		ShopItemStock stock2b = shopItemService.addStock(String.valueOf(item2.getId()), agent3.getEmail(), new Integer("10"));
+		TransactionDetail d1 = new TransactionDetail();
+		d1.setAmount(5);
+		d1.setItem(item1);
+		
+		TransactionDetail d2 = new TransactionDetail();
+		d2.setAmount(5);
+		d2.setItem(item2);
+		
+		TransactionDetail d3 = new TransactionDetail();
+		d3.setAmount(2);
+		d3.setItem(item3);
+		
+		Set<TransactionDetail> details = new HashSet<>();
+		details.add(d1);
+		details.add(d2);
+//		details.add(d3);
+		
+		List<AgentStock> stocks = transactionService.getAgentBasedCustomerLocation(details, customer.getEmail());
+		Assert.assertNotNull(stocks);
+	}
+	
 	public void testTransaction(){
 		//Create customer 
 		User u = User.UserFactory("customer", "customer1", "122344", "adres", "ccity", "2.993019", "4.2271113", "test");

@@ -19,7 +19,7 @@ public class Constant {
 	public static final String PLACES_API_GEOCODE = "https://maps.googleapis.com/maps/api/geocode";
 	public static final String API_KEY = "AIzaSyAFj7YunZys5V1taEviGXN6p6-bc2McR9M";
 	public static final String OUT_JSON = "/json";
-	public static final String GMAP_API_KEY = "AIzaSyBtcT4UkbfN9JV_4haAAYdQnhS-3wsedpk";
+	public static final String GMAP_API_KEY = "AIzaSyA0N8VKQqwmcFNYxQ72eU48KTO_xf7vnQ0";
 	public static final String TYPE_AUTOCOMPLETE = "/autocomplete";
 	public static final String VALIDATOR_REGEX_URL = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 	public static final String VALIDATOR_REGEX_AMOUNT = "\\d+";
@@ -66,5 +66,7 @@ public class Constant {
 	public static final String WS_PUT_GET_STOCK_URL = WS_URL+"shop/stock";
 	public static final String WS_PUT_POST_STOCK_URL = WS_URL+"shop/stock";
 	public static final String WS_GET_STOCK_URL = WS_URL+"shop/stock";
+	
+	public static final String GOOGLE_DIRECTION_URL = "https://maps.googleapis.com/maps/api/directions/json?";
 	
 }

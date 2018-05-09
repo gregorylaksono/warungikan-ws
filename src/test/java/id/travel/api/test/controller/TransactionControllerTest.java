@@ -79,6 +79,7 @@ public class TransactionControllerTest {
 			Assert.assertEquals(startItemStock1, stock1.getAmount());
 			Assert.assertEquals(startItemStock2, stock2.getAmount());
 			
+			
 		} catch (UserSessionException | WarungIkanNetworkException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

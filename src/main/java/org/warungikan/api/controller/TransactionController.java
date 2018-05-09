@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.warungikan.api.model.BasicResponse;
+import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.ITransactionService;
 import org.warungikan.api.service.IUserService;
 import org.warungikan.db.model.Transaction;
@@ -227,5 +228,17 @@ public class TransactionController {
 		}catch(Exception e){
 			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@GetMapping("/agents/{customer_id}")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity getAgentsBasedCustomerLocation(@PathVariable(value = "customer_id", required = true) String customer_id,
+														 @RequestBody Set<TransactionDetail> details) {
+		try {
+			 List<AgentStock> agentStock = transactionService.getAgentBasedCustomerLocation(details, customer_id);
+		}catch(Exception e) {
+			
+		}
+		return null;
 	}
 }

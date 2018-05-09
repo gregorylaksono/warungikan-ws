@@ -1,4 +1,4 @@
-package id.travel.api.test;
+package org.warungikan.api.utils;
 
 import javax.sql.DataSource;
 

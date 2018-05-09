@@ -3,6 +3,7 @@ package org.warungikan.api.service;
 import java.util.List;
 import java.util.Set;
 
+import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
@@ -53,4 +54,6 @@ public interface ITransactionService {
 	
 	//Customer
 	public Boolean isCustomerLegitimateForTransaction(String customer_id, String agent, String totalKm, Set<TransactionDetail> details);
+
+	public List<AgentStock> getAgentBasedCustomerLocation(Set<TransactionDetail> details, String customer_id);
 }

@@ -6,13 +6,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.warungikan.api.model.GeoCodeDistance;
+import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.ITransactionService;
+import org.warungikan.api.utils.Util;
 import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
@@ -361,6 +365,40 @@ public class TransactionServiceImpl implements ITransactionService {
 		}
 			
 		return null;
+	}
+	@Override
+	public List<AgentStock> getAgentBasedCustomerLocation(Set<TransactionDetail> details, String customer_id) {
+		User customer = userRepository.findUserByUserId(customer_id);
+		
+		List<Long> items = details.stream().map( e-> e.getItem().getId()).collect(Collectors.toList());
+		List<User> agents = userRepository.findAgentByShopItem(items, items.size());
+		List<AgentStock> stocks = new ArrayList();
+		
+		for(User u: agents) {
+			boolean isEnough = false;
+			for(TransactionDetail detail : details) {
+				ShopItem shopItem = shopItemRepository.findOne(detail.getItem().getId());
+				ShopItemStock stock = stockRepository.findStockItemByAgentAndItemAndCount(u, shopItem, detail.getAmount());
+				if(stock != null) {
+					isEnough = true;
+				}else {
+					isEnough = false;
+					break;
+				}
+			}
+			
+			if(isEnough) {
+				AgentData data = agentDataRepository.findDataByUser(u);
+				Map m = new Gson().fromJson(data.getData(), Map.class);
+				String price_per_km = (String) m.get(Constant.AGENT_DATA_KEY_PRICE_PER_KM);
+				GeoCodeDistance geoCode = Util.getDistance(String.valueOf(customer.getLatitude())+","+String.valueOf(customer.getLongitude()), 
+																		  u.getLatitude()+","+String.valueOf(u.getLongitude()));
+				stocks.add(new AgentStock(u, price_per_km,geoCode.getDistance().getText()));													
+			}
+		}
+		
+		
+		return stocks;
 	}
 
 
