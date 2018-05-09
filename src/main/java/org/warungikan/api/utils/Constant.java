@@ -1,4 +1,4 @@
-package id.travel.api.test;
+package org.warungikan.api.utils;
 
 public class Constant {
 
@@ -36,6 +36,7 @@ public class Constant {
 	public static final String WS_UPDATE_USER_AGENT_URL = WS_URL+"admin/user";
 	public static final String WS_DELETE_USER_URL = WS_URL+"admin/user";
 	
+	public static final String WS_POST_REGISTER_USER_URL = WS_URL+"user";
 	public static final String WS_UPDATE_SELF_USER_URL = WS_URL+"user";
 	public static final String WS_CHECK_USER_AS_USER_URL = WS_URL+"user";
 	public static final String WS_CREATE_USER_CUSTOMER_URL = WS_URL+"admin/user/customer";
@@ -66,7 +67,9 @@ public class Constant {
 	public static final String WS_PUT_GET_STOCK_URL = WS_URL+"shop/stock";
 	public static final String WS_PUT_POST_STOCK_URL = WS_URL+"shop/stock";
 	public static final String WS_GET_STOCK_URL = WS_URL+"shop/stock";
+	public static final String WS_POST_CALCULATE_AGENT_PRE = WS_URL+"transaction/agents";
 	
 	public static final String GOOGLE_DIRECTION_URL = "https://maps.googleapis.com/maps/api/directions/json?";
+	public static final String HEADER_STRING = "Authorization";
 	
 }

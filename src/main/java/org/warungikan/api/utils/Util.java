@@ -13,15 +13,14 @@ import org.warungikan.api.model.GeoCodeDistance;
 
 import com.google.gson.Gson;
 
-import id.travel.api.test.Constant;
-
 public class Util {
 
 	
 	public static GeoCodeDistance getDistance(String origin, String destination) {
 		RestTemplate t = new RestTemplate();
 		try {
-			ResponseEntity<String> response = t.exchange(new URI(Constant.GOOGLE_DIRECTION_URL+"origin="+origin+"&destination="+destination+"&key="+Constant.GMAP_API_KEY), HttpMethod.GET,null,  String.class);
+			String url = Constant.GOOGLE_DIRECTION_URL+"origin="+origin+"&destination="+destination+"&key="+Constant.GMAP_API_KEY;
+			ResponseEntity<String> response = t.exchange(new URI(url), HttpMethod.GET,null,  String.class);
 			String body = response.getBody();
 			GeoCodeDistance geoCode = parse(body);
 			return geoCode;

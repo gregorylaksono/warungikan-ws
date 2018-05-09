@@ -27,6 +27,7 @@ import org.warungikan.api.model.request.VShopItem;
 import org.warungikan.api.service.IShopItemService;
 import org.warungikan.api.service.IUserService;
 import org.warungikan.api.service.impl.ShopItemServiceImpl;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.SecurityUtils;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.ShopItem;
@@ -35,14 +36,12 @@ import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.User;
 
-import id.travel.api.test.Constant;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
 
 @RestController
 @RequestMapping("/shop")
 public class ShopItemController {
-	static final String HEADER_STRING = "Authorization";
 	@Autowired
 	private IUserService userService;
 
@@ -107,7 +106,7 @@ public class ShopItemController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_AGENT')")
 	public ResponseEntity getStockByAgent(HttpServletRequest request) {
 		try {
-			String token = request.getHeader(HEADER_STRING);
+			String token = request.getHeader(Constant.HEADER_STRING);
 			String username = SecurityUtils.getUsernameByToken(token);
 
 			User u = userService.getUserById(username);

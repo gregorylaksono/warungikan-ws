@@ -25,11 +25,11 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.warungikan.api.model.BasicResponse;
 import org.warungikan.api.model.ChangePassword;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.User;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import id.travel.api.test.Constant;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
 
@@ -85,7 +85,7 @@ public class UserManagerImpl  {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(u, headers);
-			ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_CUSTOMER_URL), request, BasicResponse.class);
+			ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_POST_REGISTER_USER_URL), request, BasicResponse.class);
 			return response.getStatusCodeValue();
 		} catch (Exception e) {
 			if((e instanceof HttpClientErrorException) || (e instanceof HttpServerErrorException)){

@@ -6,11 +6,16 @@ public class AgentStock {
 
 	private User user;
 	private String transport_price_per_km;
-	private String total_km;
+	private String total_distance;
+	private String latitude;
+	private String longitude;
 	
-	public AgentStock(User user, String transport_price_per_km, String totalKm) {
+	public AgentStock(User user, String transport_price_per_km, String totalDistance, String latitude, String longitude) {
 		setUser(user);
 		setTransport_price_per_km(transport_price_per_km);
+		setLatitude(latitude);
+		setLongitude(longitude);
+		setTotal_distance(totalDistance);
 	}
 	
 	public AgentStock() {}
@@ -28,12 +33,28 @@ public class AgentStock {
 		this.transport_price_per_km = transport_price_per_km;
 	}
 
-	public String getTotal_km() {
-		return total_km;
+	public String getTotal_distance() {
+		return total_distance;
 	}
 
-	public void setTotal_km(String total_km) {
-		this.total_km = total_km;
+	public void setTotal_distance(String total_distance) {
+		this.total_distance = total_distance;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 	
 	

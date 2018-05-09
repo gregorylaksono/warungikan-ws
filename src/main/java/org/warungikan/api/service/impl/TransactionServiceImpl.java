@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.warungikan.api.model.GeoCodeDistance;
 import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.ITransactionService;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.Util;
 import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.ShopItem;
@@ -36,8 +37,6 @@ import org.warungikan.db.repository.TransactionDetailRepository;
 import org.warungikan.db.repository.UserRepository;
 
 import com.google.gson.Gson;
-
-import id.travel.api.test.Constant;
 
 @Service
 @org.springframework.transaction.annotation.Transactional
@@ -80,6 +79,12 @@ public class TransactionServiceImpl implements ITransactionService {
 		
 		Long salePrice = calculateTransactionDetails(details);
 		Long totalPrice = salePrice + transportPrice;
+		
+		Long balance = calculateBalanceCustomer(customer_id);
+		
+		if(balance < totalPrice){
+			return null;
+		}
 		
 		Transaction t = new Transaction();
 		t.setAgent(agent).setCustomer(customer).setTransportPrice(transportPrice).
@@ -374,11 +379,11 @@ public class TransactionServiceImpl implements ITransactionService {
 		List<User> agents = userRepository.findAgentByShopItem(items, items.size());
 		List<AgentStock> stocks = new ArrayList();
 		
-		for(User u: agents) {
+		for(User agent: agents) {
 			boolean isEnough = false;
 			for(TransactionDetail detail : details) {
 				ShopItem shopItem = shopItemRepository.findOne(detail.getItem().getId());
-				ShopItemStock stock = stockRepository.findStockItemByAgentAndItemAndCount(u, shopItem, detail.getAmount());
+				ShopItemStock stock = stockRepository.findStockItemByAgentAndItemAndCount(agent, shopItem, detail.getAmount());
 				if(stock != null) {
 					isEnough = true;
 				}else {
@@ -388,12 +393,11 @@ public class TransactionServiceImpl implements ITransactionService {
 			}
 			
 			if(isEnough) {
-				AgentData data = agentDataRepository.findDataByUser(u);
+				AgentData data = agentDataRepository.findDataByUser(agent);
 				Map m = new Gson().fromJson(data.getData(), Map.class);
 				String price_per_km = (String) m.get(Constant.AGENT_DATA_KEY_PRICE_PER_KM);
-				GeoCodeDistance geoCode = Util.getDistance(String.valueOf(customer.getLatitude())+","+String.valueOf(customer.getLongitude()), 
-																		  u.getLatitude()+","+String.valueOf(u.getLongitude()));
-				stocks.add(new AgentStock(u, price_per_km,geoCode.getDistance().getText()));													
+				GeoCodeDistance geoCode = Util.getDistance(agent.getLatitude()+","+String.valueOf(agent.getLongitude()), String.valueOf(customer.getLatitude())+","+String.valueOf(customer.getLongitude()));
+				stocks.add(new AgentStock(agent, price_per_km,geoCode.getDistance().getValue(), geoCode.getStart_location().getLat(), geoCode.getStart_location().getLng()));													
 			}
 		}
 		

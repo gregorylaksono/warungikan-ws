@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.warungikan.api.model.BasicResponse;
 import org.warungikan.api.model.ChangePassword;
 import org.warungikan.api.service.IUserService;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.SecurityUtils;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
@@ -31,16 +32,15 @@ import org.warungikan.db.repository.UserRepository;
 @RestController
 public class UserController {
 
-	static final String HEADER_STRING = "Authorization";
 	@Autowired
 	private IUserService userService;
 	
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	@PostMapping("/user/{type}")
+	@PostMapping("/user")
 	public ResponseEntity register(@RequestBody User user){
-		
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User u = userService.registerUser(user);
 		if(u != null){
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
@@ -53,7 +53,7 @@ public class UserController {
 	@GetMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
 	public ResponseEntity getMyData(@PathVariable(value = "user_id", required=true) String user_id, HttpServletRequest request){
-	    String token = request.getHeader(HEADER_STRING);
+	    String token = request.getHeader(Constant.HEADER_STRING);
 	    String username = SecurityUtils.getUsernameByToken(token);
 	    
 		User u = userService.getUserById(user_id);

@@ -20,13 +20,13 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.warungikan.api.model.request.VShopItem;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.User;
 
-import id.travel.api.test.Constant;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
 

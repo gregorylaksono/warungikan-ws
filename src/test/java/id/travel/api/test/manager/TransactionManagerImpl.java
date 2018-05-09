@@ -13,12 +13,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.warungikan.api.model.response.AgentStock;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
 import org.warungikan.db.model.User;
 
-import id.travel.api.test.Constant;
 import id.travel.api.test.exception.UserSessionException;
 import id.travel.api.test.exception.WarungIkanNetworkException;
 
@@ -74,14 +75,14 @@ public class TransactionManagerImpl {
 		}
 	}
 	
-	public Transaction addTransaction(String sessionId, String customer_id, String agent_id, Long transport_prices, Long total_km,Set<TransactionDetail> details)throws UserSessionException,WarungIkanNetworkException{
+	public Transaction addTransaction(String sessionId, String agent_id, Long transport_prices, Long total_km,Set<TransactionDetail> details)throws UserSessionException,WarungIkanNetworkException{
 
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(details,headers);
 			RestTemplate t = new RestTemplate();
-			ResponseEntity<Transaction> response = t.postForEntity(new URI(Constant.WS_POST_ADD_TRANSCTION_URL+"/"+customer_id+"/"+agent_id+"/"+String.valueOf(total_km)), request, Transaction.class);
+			ResponseEntity<Transaction> response = t.postForEntity(new URI(Constant.WS_POST_ADD_TRANSCTION_URL+"/"+agent_id+"/"+String.valueOf(total_km)), request, Transaction.class);
 			
 			if(response.getStatusCodeValue() == 202){
 				return response.getBody();
@@ -143,7 +144,7 @@ public class TransactionManagerImpl {
 		}
 	}
 	
-	public List<TransactionState> getTransactionState(String sessionId, String user_id)throws UserSessionException,WarungIkanNetworkException{
+	public List<TransactionState> getTransactionState(String sessionId, String trx_id)throws UserSessionException,WarungIkanNetworkException{
 
 		try {
 			HttpHeaders headers = new HttpHeaders();
@@ -151,7 +152,7 @@ public class TransactionManagerImpl {
 			HttpEntity request = new HttpEntity<>(headers);
 			RestTemplate t = new RestTemplate();
 			
-			ResponseEntity<List<TransactionState>> response = t.exchange(new URI(Constant.WS_GET_TRANSCTION_STATE_URL),HttpMethod.GET, request, new ParameterizedTypeReference<List<TransactionState>>(){});
+			ResponseEntity<List<TransactionState>> response = t.exchange(new URI(Constant.WS_GET_TRANSCTION_STATE_URL+"?state_id="+trx_id),HttpMethod.GET, request, new ParameterizedTypeReference<List<TransactionState>>(){});
 			if(response.getStatusCodeValue() == 202){
 				return response.getBody();
 			}
@@ -174,7 +175,7 @@ public class TransactionManagerImpl {
 			HttpEntity request = new HttpEntity<>(headers);
 			RestTemplate t = new RestTemplate();
 			
-			ResponseEntity<Map> response = t.exchange(new URI(Constant.WS_GET_TRANSCTION_BALANCE_CUSTOMER_URL+"/"+user_id),HttpMethod.GET, request, Map.class);
+			ResponseEntity<Map> response = t.exchange(new URI(Constant.WS_GET_TRANSCTION_BALANCE_CUSTOMER_URL+"?user_id="+user_id),HttpMethod.GET, request, Map.class);
 			if(response.getStatusCodeValue() == 202){
 				Map bodyResponse = response.getBody();
 				Long balance = Long.parseLong(String.valueOf(bodyResponse.get("balance")));
@@ -199,7 +200,7 @@ public class TransactionManagerImpl {
 			HttpEntity request = new HttpEntity<>(headers);
 			RestTemplate t = new RestTemplate();
 			
-			ResponseEntity<Map> response = t.exchange(new URI(Constant.WS_GET_TRANSCTION_BALANCE_AGENT_URL+"/"+user_id),HttpMethod.GET, request, Map.class);
+			ResponseEntity<Map> response = t.exchange(new URI(Constant.WS_GET_TRANSCTION_BALANCE_AGENT_URL+"?user_id="+user_id),HttpMethod.GET, request, Map.class);
 			if(response.getStatusCodeValue() == 202){
 				Map bodyResponse = response.getBody();
 				Long balance = Long.parseLong(String.valueOf(bodyResponse.get("balance")));
@@ -223,7 +224,7 @@ public class TransactionManagerImpl {
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(headers);
 			RestTemplate t = new RestTemplate();
-			ResponseEntity<Map> response = t.postForEntity(new URI(Constant.WS_GET_TRANSACTION_CALC_TRANSPORT_URL+"/"+agent_id+"/"+String.valueOf(total_km)), request, Map.class);
+			ResponseEntity<Map> response = t.exchange(new URI(Constant.WS_GET_TRANSACTION_CALC_TRANSPORT_URL+"?agent_id="+agent_id+"&total_km="+String.valueOf(total_km)),HttpMethod.GET, request, Map.class);
 			
 			if(response.getStatusCodeValue() == 202){
 				Map bodyResponse = response.getBody();
@@ -286,7 +287,7 @@ public class TransactionManagerImpl {
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(details,headers);
 			RestTemplate t = new RestTemplate();
-			ResponseEntity<Map> response = t.postForEntity(new URI(Constant.WS_POST_TRANSCTION_IS_LEGIT_URL+"/"+customer_id+"/"+agent_id+"/"+String.valueOf(total_km)), request, Map.class);
+			ResponseEntity<Map> response = t.postForEntity(new URI(Constant.WS_POST_TRANSCTION_IS_LEGIT_URL+"?customer_id"+customer_id+"&agent="+agent_id+"&total_km="+String.valueOf(total_km)), request, Map.class);
 			
 			if(response.getStatusCodeValue() == 202){
 				Map bodyResponse = response.getBody();
@@ -300,6 +301,26 @@ public class TransactionManagerImpl {
 			}
 			
 		} catch (Exception e) {
+			throw new WarungIkanNetworkException("Could not connect to server");
+		}
+	}
+	
+	public List<AgentStock> getAgentBasedCustomerLocation(String sessionId, Set<TransactionDetail> details)throws UserSessionException,WarungIkanNetworkException{
+		try{
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", sessionId);
+			HttpEntity request = new HttpEntity<>(details,headers);
+			RestTemplate t = new RestTemplate();
+			ResponseEntity<List<AgentStock>> response = t.exchange(new URI(Constant.WS_POST_CALCULATE_AGENT_PRE),HttpMethod.POST, request, new ParameterizedTypeReference<List<AgentStock>>(){});
+			if(response.getStatusCodeValue() == 202){
+				return response.getBody();
+			}else if(response.getStatusCodeValue() == 401){
+				throw new UserSessionException("Could not identified user");
+			}else {
+				return null;
+			}
+			
+		}catch(Exception e){
 			throw new WarungIkanNetworkException("Could not connect to server");
 		}
 	}

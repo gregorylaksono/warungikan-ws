@@ -6,10 +6,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.warungikan.api.service.IUserService;
+import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.TopupWalletHistory;
@@ -20,8 +22,6 @@ import org.warungikan.db.repository.TopupWalletRepository;
 import org.warungikan.db.repository.UserRepository;
 
 import com.google.gson.Gson;
-
-import id.travel.api.test.Constant;
 
 @Service
 public class UserServiceImpl implements IUserService{
@@ -169,7 +169,8 @@ public class UserServiceImpl implements IUserService{
 	public Boolean addBalance(String user_id, Long amount) {
 		User u = userRepository.findUserByUserId(user_id);
 		if(u!=null){
-			if(u.getRoles().contains("ROLE_USER")) {
+			List<Role> roles = roleRepository.findRoleByUser(user_id);
+			if(roles.stream().filter( r -> r.getName().equals("ROLE_USER")).collect(Collectors.toList()).size() > 0) {
 				TopupWalletHistory t = new TopupWalletHistory();
 				t.setAmount(amount);
 				t.setUser(u);

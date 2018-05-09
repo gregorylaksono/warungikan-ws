@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.warungikan.api.model.BasicResponse;
 import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.ITransactionService;
 import org.warungikan.api.service.IUserService;
+import org.warungikan.api.utils.Constant;
+import org.warungikan.api.utils.SecurityUtils;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
@@ -68,16 +73,17 @@ public class TransactionController {
 	}
 	
 	
-	@PostMapping("/{customer_id}/{agent_id}/{total_km}")
+	@PostMapping("/{agent_id}/{transport_price}")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity addTransaction(@PathVariable(value="customer_id", required=true) String customer_id,
-										 @PathVariable(value="agent_id", required=true) String agent_id,
+	public ResponseEntity addTransaction(@PathVariable(value="agent_id", required=true) String agent_id,
 										 @PathVariable(value="transport_price", required=true) String transport_price,
-										 @RequestBody Set<TransactionDetail> details ){
+										 @RequestBody Set<TransactionDetail> details , HttpServletRequest request){
 		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String customer_id = SecurityUtils.getUsernameByToken(token);
 			Long transportPrice = Long.parseLong(transport_price);
 			Transaction trx = transactionService.addTransaction(customer_id, agent_id, details, transportPrice);
-			return new ResponseEntity(trx, HttpStatus.OK);
+			return new ResponseEntity(trx, HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
 		}
@@ -94,18 +100,17 @@ public class TransactionController {
 		}
 	}
 	
-	@GetMapping("/state/{user_id}")
+	@GetMapping("/state")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity getTransactionState(@PathVariable(value = "user_id", required = true) String user_id){
+	public ResponseEntity getTransactionState(@RequestParam(value = "state_id", required = true) String trx_id){
 		try{
-			Long oid = Long.parseLong(user_id);
-			List<TransactionState> trxsState = transactionService.getTransactionStateByTransaction(oid);
+			Long trxId = Long.parseLong(trx_id);
+			List<TransactionState> trxsState = transactionService.getTransactionStateByTransaction(trxId);
 			return new ResponseEntity(trxsState, HttpStatus.ACCEPTED);	
 		}catch(Exception e){
 			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
 
 	@GetMapping("/agent/{user_id}")
 	@PreAuthorize("hasRole('ROLE_AGENT')")
@@ -173,9 +178,9 @@ public class TransactionController {
 		}
 	}
 	
-	@GetMapping("/balance/customer/{user_id}")
+	@GetMapping("/balance/customer")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	public ResponseEntity getBalanceCustomer(@PathVariable(value = "user_id", required = true) String user_id){
+	public ResponseEntity getBalanceCustomer(@RequestParam(value = "user_id", required = true) String user_id){
 		try{
 			Long balance = transactionService.calculateBalanceCustomer(user_id);
 			Map<String, String> response = new HashMap<String, String>();
@@ -186,9 +191,9 @@ public class TransactionController {
 		}
 	}
 	
-	@GetMapping("/balance/agent/{user_id}")
+	@GetMapping("/balance/agent")
 	@PreAuthorize("hasRole('ROLE_AGENT') or hasRole('ROLE_ADMIN')")
-	public ResponseEntity getBalanceAgent(@PathVariable(value = "user_id", required = true) String user_id){
+	public ResponseEntity getBalanceAgent(@RequestParam(value = "user_id", required = true) String user_id){
 		try{
 			Long balance = transactionService.calculateBalanceAgent(user_id);
 			Map<String, String> response = new HashMap<String, String>();
@@ -199,10 +204,10 @@ public class TransactionController {
 		}
 	}
 	
-	@GetMapping("/transport_price/{total_km}/{agent_id}")
+	@GetMapping("/transport_price")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	public ResponseEntity calculateTransportPrice(@PathVariable(value = "agent_id", required = true) String user_id,
-												  @PathVariable(value = "total_km", required = true) String total_km){
+	public ResponseEntity calculateTransportPrice(@RequestParam(value = "agent_id", required = true) String user_id,
+												  @RequestParam(value = "total_km", required = true) String total_km){
 		try{
 			Long price = transactionService.calculateTransportPrice(total_km, user_id);
 			Map<String, String> response = new HashMap<String, String>();
@@ -213,12 +218,12 @@ public class TransactionController {
 		}
 	}
 	
-	@PostMapping("/is_legit/{customer_id}/{total_km}")
+	@PostMapping("/is_legit")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 	public ResponseEntity isCustomerLegitimateForTransaction(
-						@PathVariable(value = "customer_id", required = true) String customer_id,
-						@PathVariable(value = "agent", required = true) String agent,
-						@PathVariable(value = "total_km", required = true) String total_km,
+						@RequestParam(value = "customer_id", required = true) String customer_id,
+						@RequestParam(value = "agent", required = true) String agent,
+						@RequestParam(value = "total_km", required = true) String total_km,
 						@RequestBody Set<TransactionDetail> details){
 		try{
 			Boolean isLegit = transactionService.isCustomerLegitimateForTransaction(customer_id, agent, total_km, details);
@@ -230,15 +235,18 @@ public class TransactionController {
 		}
 	}
 	
-	@GetMapping("/agents/{customer_id}")
+	@PostMapping("/agents")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity getAgentsBasedCustomerLocation(@PathVariable(value = "customer_id", required = true) String customer_id,
-														 @RequestBody Set<TransactionDetail> details) {
+	public ResponseEntity getAgentsBasedCustomerLocation(@RequestBody Set<TransactionDetail> details, HttpServletRequest request) {
 		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String customer_id = SecurityUtils.getUsernameByToken(token);
 			 List<AgentStock> agentStock = transactionService.getAgentBasedCustomerLocation(details, customer_id);
+			 return new ResponseEntity(agentStock, HttpStatus.ACCEPTED);	
 		}catch(Exception e) {
-			
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
 		}
-		return null;
 	}
+	
+	
 }
