@@ -52,8 +52,8 @@ public class AdminController {
 			roles = userService.getRoleByName("ROLE_AGENT");
 		}
 		
-		User u = registerUser(user,price_per_km, roles);
-		if(u != null){
+		if(roles != null){
+			User u = registerUser(user,price_per_km, roles);
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
 		}
 		else{

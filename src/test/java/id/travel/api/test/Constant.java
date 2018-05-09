@@ -62,7 +62,9 @@ public class Constant {
 	public static final String WS_GET_GET_SHOP_ITEM_URL = WS_URL+"shop/item";
 	public static final String WS_POST_CREATE_SHOP_ITEM_URL = WS_URL+"shop/item";
 	public static final String WS_PUT_UPDATE_SHOP_ITEM_URL = WS_URL+"shop/item";
+	public static final String WS_POST_ADD_STOCK_ITEM_AGENT_URL = WS_URL+"shop/stock";
 	public static final String WS_PUT_GET_STOCK_URL = WS_URL+"shop/stock";
 	public static final String WS_PUT_POST_STOCK_URL = WS_URL+"shop/stock";
+	public static final String WS_GET_STOCK_URL = WS_URL+"shop/stock";
 	
 }

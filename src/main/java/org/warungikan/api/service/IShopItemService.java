@@ -12,4 +12,5 @@ public interface IShopItemService {
 	public ShopItem updateShopItem(String id, String name, String description, String url, String price);
 	public ShopItemStock addStock(String shopId, String user_id, Integer amount );
 	public List<ShopItemStock> getStockByAgent(String user_id);
+	public List<ShopItemStock> getAllStocks();
 }

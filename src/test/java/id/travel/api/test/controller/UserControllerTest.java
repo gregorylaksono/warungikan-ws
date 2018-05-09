@@ -53,10 +53,10 @@ public class UserControllerTest {
 			UserManagerImpl userManager = new UserManagerImpl();
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-			int status = userManager.createUserAgent(jwt, "user12", "admin_test_get_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+			String agentEmail = userManager.createUserAgent(jwt, "user12", "admin_test_get_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","3000");
 
 			// Retrieve user by user id using admin role
-			Assert.assertEquals(status, 200);
+			Assert.assertEquals("admin_test_get_single_user", agentEmail);
 			User u = userManager.getSingleUserAsAdmin(jwt,"admin_test_get_single_user");
 			Assert.assertNotNull(u);
 			Assert.assertEquals("admin_test_get_single_user",u.getEmail());
@@ -74,10 +74,10 @@ public class UserControllerTest {
 			
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-			int status = userManager.createUserAgent(jwt, "user1", "admin_test_delete_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+			String agentEmail = userManager.createUserAgent(jwt, "user1", "admin_test_delete_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","1000");
 
 			// Retrieve user by user id using admin role
-			Assert.assertEquals(status, 200);
+			Assert.assertEquals("admin_test_delete_single_user", agentEmail);
 			Boolean isDeleted = userManager.deleteUser(jwt, "admin_test_delete_single_user");
 			Assert.assertTrue(isDeleted);
 			
@@ -96,10 +96,10 @@ public class UserControllerTest {
 			
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-			int status = userManager.createUserAgent(jwt, "user1", "admin_test_update_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+			String agentEmail = userManager.createUserAgent(jwt, "user1", "admin_test_update_single_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","3000");
 
 			// Retrieve user by user id using admin role
-			Assert.assertEquals(status, 200);
+			Assert.assertEquals("admin_test_update_single_user", agentEmail);
 			
 			String updateName = "updatename";
 			String updateEmail = "admin_test_update_single_user2";
@@ -138,12 +138,12 @@ public class UserControllerTest {
 			
 			// Create user using admin role
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-			int status = userManager.createUserAgent(jwt, "user1", "admin_test_get_all_user1", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
-			int status2 = userManager.createUserAgent(jwt, "user2", "admin_test_get_all_user2", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+			String emailAgent1 = userManager.createUserAgent(jwt, "user1", "admin_test_get_all_user1", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","2300");
+			String emailAgent2 = userManager.createUserAgent(jwt, "user2", "admin_test_get_all_user2", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","2100");
 
 			// Retrieve user by user id using admin role
-			Assert.assertEquals(status, 200);
-			Assert.assertEquals(status2, 200);
+			Assert.assertEquals("admin_test_get_all_user1", emailAgent1);
+			Assert.assertEquals("admin_test_get_all_user2", emailAgent2);
 			
 			User u1 = userManager.getSingleUserAsAdmin(jwt, "admin_test_get_all_user1");
 			User u2 = userManager.getSingleUserAsAdmin(jwt, "admin_test_get_all_user2");
@@ -168,10 +168,10 @@ public class UserControllerTest {
 		
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-		int status = userManager.createUserAgent(jwt, "user1", "admin_test_get_all_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+		String agentEmail = userManager.createUserAgent(jwt, "user1", "admin_test_get_all_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","1700");
 
 		// Retrieve user by user id using admin role
-		Assert.assertEquals(status, 200);
+		Assert.assertEquals("admin_test_get_all_user", agentEmail);
 
 		// Attempt to get user as ADMIN
 		jwt = userManager.login("email1", "testpassword");
@@ -184,16 +184,16 @@ public class UserControllerTest {
 		
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-		int status = userManager.createUserAgent(jwt, "user1", "test_create_user_as_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+		String emailAgent = userManager.createUserAgent(jwt, "user1", "test_create_user_as_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","2000");
 
 		// Retrieve user by user id using admin role
-		Assert.assertEquals(status, 200);
+		Assert.assertEquals("test_create_user_as_user", emailAgent);
 
 		// delete user as user role
 		User u = userManager.getSingleUserAsAdmin(jwt, "test_create_user_as_user");
 		jwt = userManager.login("test_create_user_as_user", "testpassword");
 		
-		Integer r = userManager.createUserAgent(jwt, "asdasd", u.getEmail(), "test_create_user_as_user2", "3asdasd", "asdasd3", "91.9921", "2.1123", "testestest");
+		String r = userManager.createUserAgent(jwt, "asdasd", u.getEmail(), "test_create_user_as_user2", "3asdasd", "asdasd3", "91.9921", "2.1123", "testestest","3000");
 		
 	}
 	
@@ -202,10 +202,10 @@ public class UserControllerTest {
 		
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-		int status = userManager.createUserAgent(jwt, "user1", "test_delete_user_as_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+		String agent = userManager.createUserAgent(jwt, "user1", "test_delete_user_as_user", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","3200");
 
 		// Retrieve user by user id using admin role
-		Assert.assertEquals(status, 200);
+		Assert.assertEquals("test_delete_user_as_user", agent);
 
 		// delete user as user role
 		jwt = userManager.login("test_delete_user_as_user", "testpassword");
@@ -216,10 +216,10 @@ public class UserControllerTest {
 	public void test_user_change_password() throws UserSessionException, WarungIkanNetworkException{
 		UserManagerImpl userManager = new UserManagerImpl();
 		String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-		int status = userManager.createUserAgent(jwt, "user1", "test_user_change_password5", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword");
+		String gg = userManager.createUserAgent(jwt, "user1", "test_user_change_password5", "012394857", "address", "city", "1.33330", "-3.330022", "testpassword","2111");
 
 		// Retrieve user by user id using admin role
-		Assert.assertEquals(status, 200);
+		Assert.assertEquals("test_user_change_password5", gg);
 
 		// login user as user role
 		jwt = userManager.login("test_user_change_password5", "testpassword");

@@ -96,16 +96,16 @@ public class UserManagerImpl  {
 		}
 		return null;
 	}
-	public Integer createUserAgent(String sessionId,String name, String email, String telNo, String address, String city, String latitude,
-			String longitude, String password) throws UserSessionException,WarungIkanNetworkException{
+	public String createUserAgent(String sessionId,String name, String email, String telNo, String address, String city, String latitude,
+			String longitude, String password, String pricePerKm) throws UserSessionException,WarungIkanNetworkException{
 		try {
 			User u = User.UserFactory(name, email, telNo, address, city, latitude, longitude, password);
 			RestTemplate r = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
 			HttpEntity request = new HttpEntity<>(u, headers);
-			ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_AGENT_URL), request, BasicResponse.class);
-			return response.getStatusCodeValue();
+			ResponseEntity<BasicResponse> response = r.postForEntity(new URI(Constant.WS_CREATE_USER_AGENT_URL+"/"+pricePerKm), request, BasicResponse.class);
+			return response.getBody().getInfo();
 		} catch (Exception e) {
 			if((e instanceof HttpClientErrorException) || (e instanceof HttpServerErrorException)){
 				throw new UserSessionException("token is wrong");

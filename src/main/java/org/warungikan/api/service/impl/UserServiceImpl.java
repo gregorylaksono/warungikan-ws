@@ -206,5 +206,11 @@ public class UserServiceImpl implements IUserService{
 		}
 	}
 
+	@Override
+	public List<Role> getRoles(String userId) {
+		List<Role>roles = roleRepository.findRoleByUser(userId);
+		return roles;
+	}
+
 
 }

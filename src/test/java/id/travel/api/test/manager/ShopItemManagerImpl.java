@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -20,6 +21,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.warungikan.api.model.request.VShopItem;
 import org.warungikan.db.model.ShopItem;
+import org.warungikan.db.model.ShopItemStock;
+import org.warungikan.db.model.Transaction;
+import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.User;
 
 import id.travel.api.test.Constant;
@@ -96,5 +100,53 @@ public class ShopItemManagerImpl {
 			}
 		}
 		return new ArrayList<>();
+	}
+	
+	public List<ShopItemStock> getStockItem(String sessionId) throws UserSessionException,WarungIkanNetworkException{
+		try {
+			RestTemplate r = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", sessionId);
+			HttpEntity request = new HttpEntity<>(headers);
+			ResponseEntity<List<ShopItemStock>> response = r.exchange(new URI(Constant.WS_GET_STOCK_URL),HttpMethod.GET, request, new ParameterizedTypeReference<List<ShopItemStock>>(){});
+			if(response.getStatusCodeValue() == 202){
+				List<ShopItemStock> body = response.getBody();
+				return body;
+			}else if(response.getStatusCodeValue() == 401){
+				throw new UserSessionException("Could not identified user");
+			}else {
+				return null;
+			}
+		} catch (Exception e) {
+			if((e instanceof HttpClientErrorException) || (e instanceof HttpServerErrorException)){
+				throw new UserSessionException("token is wrong");
+			}else if(e instanceof ResourceAccessException){
+				throw new WarungIkanNetworkException("Could not connect to server");
+			}
+		}
+		return new ArrayList<>();
+	}
+	
+	public ShopItemStock addStockByAgent(String sessionId, String stockId, String user_id, Integer amount)throws UserSessionException,WarungIkanNetworkException{
+
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", sessionId);
+			HttpEntity request = new HttpEntity<>(headers);
+			RestTemplate t = new RestTemplate();
+			ResponseEntity<ShopItemStock> response = t.postForEntity(new URI(Constant.WS_POST_ADD_STOCK_ITEM_AGENT_URL+"/"+stockId+"/"+user_id+"/"+String.valueOf(amount)), request, ShopItemStock.class);
+			
+			if(response.getStatusCodeValue() == 202){
+				return response.getBody();
+			}
+			else if(response.getStatusCodeValue() == 401){
+				throw new UserSessionException("Could not identified user");
+			}else {
+				return null;
+			}
+			
+		} catch (Exception e) {
+			throw new WarungIkanNetworkException("Could not connect to server");
+		}
 	}
 }

@@ -72,4 +72,9 @@ public class ShopItemServiceImpl implements IShopItemService{
 		return stockRepository.save(stock);
 	}
 
+	@Override
+	public List<ShopItemStock> getAllStocks() {
+		return stockRepository.findAll();
+	}
+
 }
