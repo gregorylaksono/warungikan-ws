@@ -160,7 +160,7 @@ public class ServiceTest {
 		
 		//Start transaction
 		Transaction t = transactionService.addTransaction(customer.getEmail(), agent.getEmail(), details, totalTransportPrice);
-		Assert.assertEquals(details.size(), t.getTransactionDetails().size());
+//		Assert.assertEquals(details.size(), t.getTransactionDetails().size());
 		Assert.assertEquals(customer.getEmail(), t.getCustomer().getEmail());
 		Assert.assertEquals(agent.getEmail(), t.getAgent().getEmail());
 		

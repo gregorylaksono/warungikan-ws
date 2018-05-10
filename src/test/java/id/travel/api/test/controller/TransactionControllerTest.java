@@ -2,17 +2,15 @@ package id.travel.api.test.controller;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-import org.warungikan.api.TravelLauncher;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
@@ -28,16 +26,51 @@ import id.travel.api.test.manager.UserManagerImpl;
 
 public class TransactionControllerTest {
 
+	
+	
+	public JavaMailSender getJavaMailSender() {
+	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+	    mailSender.setHost("smtp.gmail.com");
+	    mailSender.setPort(587);
+	     
+	    mailSender.setUsername("greg.laksono@gmail.com");
+	    mailSender.setPassword("qnubnnebvhothoxa");
+	     
+	    Properties props = mailSender.getJavaMailProperties();
+	    props.put("mail.transport.protocol", "smtp");
+	    props.put("mail.smtp.auth", "true");
+	    props.put("mail.smtp.starttls.enable", "true");
+	    props.put("mail.debug", "true");
+	     
+	    return mailSender;
+	}
+	
 	@Test
+	public void testEmail(){
+		try{
+			SimpleMailMessage mail = new SimpleMailMessage();
+			mail.setTo("greg.laksono@gmail.com");
+			mail.setText("test here");
+			mail.setSubject("test subject");
+			getJavaMailSender().send(mail);
+			System.out.println("Success");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+//	@Test
 	public void trxControllerTest() {
+		
 		UserManagerImpl userManager = new UserManagerImpl();
 		TransactionManagerImpl trxManager = new TransactionManagerImpl();
 		ShopItemManagerImpl shopItemManager = new ShopItemManagerImpl();
 
-		String customerUserId =  "gregtest@email.com";
-		String agent1UserId = "agent1greg@email.com";
-		String agent2UserId = "agent2greg@email.com";
+		String customerUserId =  "customer_"+UUID.randomUUID().toString().substring(0,6);
+		String agent1UserId = "agent2_"+UUID.randomUUID().toString().substring(0,6);
+		String agent2UserId = "agent1_"+UUID.randomUUID().toString().substring(0,6);
 		try {
+			
 			String adminJwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
 
 			//Create customer
@@ -184,6 +217,14 @@ public class TransactionControllerTest {
 			Assert.assertNotNull(states);
 			Assert.assertTrue(states.size() == 1);
 			
+			List<Transaction> transactionAgents = trxManager.getTransactionAgent(agent1Jwt);
+			List<Transaction> transactionCustomers = trxManager.getTransactionCustomer(customerJwt);
+			
+			Assert.assertNotNull(transactionAgents);
+			Assert.assertNotNull(transactionCustomers);
+			
+			Assert.assertEquals(1, transactionCustomers.size());
+			Assert.assertEquals(1, transactionAgents.size());
 		} catch (UserSessionException | WarungIkanNetworkException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

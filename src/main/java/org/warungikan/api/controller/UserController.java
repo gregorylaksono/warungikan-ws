@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.warungikan.api.model.BasicResponse;
@@ -46,7 +47,7 @@ public class UserController {
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
 		}
 		else{
-			return new ResponseEntity<BasicResponse>(new BasicResponse("User with id exists alread", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User with id exists already", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -67,9 +68,25 @@ public class UserController {
 
 	@PutMapping("/user/{user_id}")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity updateUserById(@PathVariable(value = "user_id", required = true) String user_id, @RequestBody User user){
+	public ResponseEntity updateUserById(@RequestParam(value = "user_id", required = true) String user_id, @RequestBody User user){
 		User u = userService.update(user_id,user);
 		return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
+	}
+	
+	@PutMapping("/user/enable")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
+	public ResponseEntity enableUser(HttpServletRequest request){
+		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+			if(userService.enableUser(user_id)){
+				return new ResponseEntity<BasicResponse>(new BasicResponse("User is enabled", "SUCCESS", ""), HttpStatus.OK);
+			}else{
+				return new ResponseEntity<BasicResponse>(new BasicResponse("User can not be enabled", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}catch(Exception e){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User can not be enabled", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@PutMapping("/user/change_password/{user_id}")

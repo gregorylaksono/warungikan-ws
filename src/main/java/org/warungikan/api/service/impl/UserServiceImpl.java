@@ -6,10 +6,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
+import org.warungikan.api.config.EmailConfig;
 import org.warungikan.api.service.IUserService;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.AgentData;
@@ -38,6 +47,12 @@ public class UserServiceImpl implements IUserService{
 	@Autowired
 	private AgentDataRepository agentDataRepository;
 	
+	@Autowired
+	private JavaMailSender mailSender;
+	
+	@Autowired
+	private EmailConfig config;
+	
 	@Override
 	public User login(String email, String password) {
 		
@@ -46,13 +61,22 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User registerUser(User user,List<String> roles, String pricePerKm) {
+		try {
+			InternetAddress emailAddr = new InternetAddress(user.getEmail());
+			emailAddr.validate();
+		} catch (AddressException e) {
+			return null;
+		}
 		if(!isUserIdExist(user.getEmail())){
 			List<Role> rolesDb = roleRepository.findRolesByArrayName(roles);
 			user.setCreationDate(new Date());
-			user.setEnable(true);
+			user.setEnable(false);
 			user.setBalance(0l);
 			user.addAllRole(rolesDb);
+			String random_confirmation_key = generateRandomConfirmationKey();
+			user.setRandomConfirmationKey(random_confirmation_key);
 			user = userRepository.save(user);
+			sendMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey());
 			if(pricePerKm != null){
 				Long.parseLong(pricePerKm);
 				AgentData d = new AgentData();
@@ -68,6 +92,65 @@ public class UserServiceImpl implements IUserService{
 			return null;
 		}
 		
+	}
+	
+	
+
+	private void sendMessage(User user, String link) {
+		String name = user.getName();
+		String htmlMessage = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"+
+							 "<html lang=\"en\">"+
+							 "<head>"+
+							 "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"+
+							 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"+
+							 "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"+
+							 "<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">"+
+							 "<title></title>"+
+							 "<style type=\"text/css\">"+
+							 ".logo{display:block;width:100%;}"+
+							 ".message{width:700px;margin:0 auto;}"+
+							 "p{font-family: 'Roboto', sans-serif;}"+
+							 "</style>"+
+							 "</head>"+
+							 "<body style=\"margin:0; padding:0; background-color:#F2F2F2;\">"+
+							 "<img src=\"http://warungikan.com/images/headweb3.png\" class=\"logo\">"+
+							 "<div class=\"message\">"+
+							 "<p>Hi "+name+",</p>"+
+							 "<p>Selamat datang di warungikan.com. Terima kasih telah mendaftar di toko kami. Pendaftaran anda hampir selesai. Kunjungi <a href=\" \">link ini</a> sebagai konfirmasi pendaftaran anda</p>"+
+							 "<br>"+
+							 "<p>Best regards,</p>"+
+							 "<p>WarungIkan admin</p>"+
+							 "</div>"+
+							 "</body>"+
+							 "</html>";
+		MimeMessagePreparator preparator = new MimeMessagePreparator(){
+
+			@Override
+			public void prepare(MimeMessage mimeMessage) throws Exception {
+				MimeMessageHelper msg = new MimeMessageHelper(mimeMessage);
+				msg.setTo(user.getEmail());
+				msg.setSubject("Konfirmasi email anda");
+				msg.setFrom("admin@warungikan.com");
+				msg.setText(htmlMessage, true);
+				
+			}
+			
+		};
+		try{
+			mailSender.send(preparator);
+		}catch(Exception e){
+			
+		}
+	}
+
+	private String generateRandomConfirmationKey() {
+		String random = UUID.randomUUID().toString()+UUID.randomUUID().toString().replace("-", "");
+		User u = userRepository.findUserByConfirmationKey(random);
+		while(u!=null){
+			random = UUID.randomUUID().toString()+UUID.randomUUID().toString().replace("-", "");
+			u = userRepository.findUserByConfirmationKey(random);
+		}
+		return random;
 	}
 
 	@Override
@@ -212,6 +295,19 @@ public class UserServiceImpl implements IUserService{
 		List<Role>roles = roleRepository.findRoleByUser(userId);
 		return roles;
 	}
+
+	@Override
+	public Boolean enableUser(String userId) {
+		try{
+			User user = userRepository.findUserByUserId(userId);
+			user.setEnable(true);
+			user.setLastModifiedDate(new Date());
+			userRepository.save(user);
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+			}
 
 
 }

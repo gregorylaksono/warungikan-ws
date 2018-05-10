@@ -71,5 +71,7 @@ public class Constant {
 	
 	public static final String GOOGLE_DIRECTION_URL = "https://maps.googleapis.com/maps/api/directions/json?";
 	public static final String HEADER_STRING = "Authorization";
+	public static final String IV = "AAAAAAAAAAAAFFFF";
+	public static final String ENC_KEY = "NhzeepOXvXgSTrOxMuNMT1zHO6PQj2Gc6JnRQgMD";
 	
 }

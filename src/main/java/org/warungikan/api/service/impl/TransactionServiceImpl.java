@@ -88,7 +88,8 @@ public class TransactionServiceImpl implements ITransactionService {
 		
 		Transaction t = new Transaction();
 		t.setAgent(agent).setCustomer(customer).setTransportPrice(transportPrice).
-		setTransactionDetails(details).setTotalPrice(totalPrice).setCreationDate(new Date());
+		setTotalPrice(totalPrice).setCreationDate(new Date());
+//		setTransactionDetails(details).setTotalPrice(totalPrice).setCreationDate(new Date());
 		t = transactionRepository.save(t);
 		try{
 			for(TransactionDetail d: details){
@@ -105,8 +106,8 @@ public class TransactionServiceImpl implements ITransactionService {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		Long[] ids = extractTrxDetailsId(details);
-		List <TransactionDetail> trxDetails = trxDetailRepository.findTransactionDetailByDetailsId(ids);
+//		Long[] ids = extractTrxDetailsId(details);
+		List <TransactionDetail> trxDetails = trxDetailRepository.findTransactionDetailByTransactionId(t);
 		
 		TransactionState state = new TransactionState();
 		state.setTransaction(t);

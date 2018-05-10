@@ -23,4 +23,5 @@ public interface IUserService {
 	public User registerUser(User user);
 	public Long getPricePerKm(String agent);
 	public List<Role> getRoles(String userId);
+	public Boolean enableUser(String userId);
 }

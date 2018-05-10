@@ -89,10 +89,12 @@ public class TransactionController {
 		}
 	}
 	
-	@GetMapping("/customer/{user_id}")
+	@GetMapping("/customer")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	public ResponseEntity getTransactionCustomer(@PathVariable(value = "user_id", required = true) String user_id){
+	public ResponseEntity getTransactionCustomer(HttpServletRequest request){
 		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
 			List<Transaction> trxs = transactionService.getTransactionCustomer(user_id);
 			return new ResponseEntity(trxs, HttpStatus.ACCEPTED);
 		}catch(Exception e){
@@ -112,10 +114,12 @@ public class TransactionController {
 		}
 	}
 
-	@GetMapping("/agent/{user_id}")
+	@GetMapping("/agent")
 	@PreAuthorize("hasRole('ROLE_AGENT')")
-	public ResponseEntity getTransactionAgent(@PathVariable(value = "user_id", required = true) String user_id){
+	public ResponseEntity getTransactionAgent(HttpServletRequest request){
 		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
 			List<Transaction> trxs = transactionService.getTransactionAgent(user_id);
 			return new ResponseEntity(trxs, HttpStatus.ACCEPTED);
 		}catch(Exception e){

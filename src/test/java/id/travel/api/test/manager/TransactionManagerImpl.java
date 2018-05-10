@@ -98,7 +98,7 @@ public class TransactionManagerImpl {
 		}
 	}
 	
-	public List<Transaction> getTransactionCustomer(String sessionId, String user_id)throws UserSessionException,WarungIkanNetworkException{
+	public List<Transaction> getTransactionCustomer(String sessionId)throws UserSessionException,WarungIkanNetworkException{
 
 		try {
 			HttpHeaders headers = new HttpHeaders();
@@ -121,7 +121,7 @@ public class TransactionManagerImpl {
 		}
 	}
 	
-	public List<Transaction> getTransactionAgent(String sessionId, String user_id)throws UserSessionException,WarungIkanNetworkException{
+	public List<Transaction> getTransactionAgent(String sessionId)throws UserSessionException,WarungIkanNetworkException{
 
 		try {
 			HttpHeaders headers = new HttpHeaders();
