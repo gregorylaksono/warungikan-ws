@@ -184,8 +184,10 @@ public class TransactionController {
 	
 	@GetMapping("/balance/customer")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-	public ResponseEntity getBalanceCustomer(@RequestParam(value = "user_id", required = true) String user_id){
+	public ResponseEntity getBalanceCustomer(HttpServletRequest request){
 		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
 			Long balance = transactionService.calculateBalanceCustomer(user_id);
 			Map<String, String> response = new HashMap<String, String>();
 			response.put("balance", String.valueOf(balance));
@@ -197,8 +199,10 @@ public class TransactionController {
 	
 	@GetMapping("/balance/agent")
 	@PreAuthorize("hasRole('ROLE_AGENT') or hasRole('ROLE_ADMIN')")
-	public ResponseEntity getBalanceAgent(@RequestParam(value = "user_id", required = true) String user_id){
+	public ResponseEntity getBalanceAgent(HttpServletRequest request){
 		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
 			Long balance = transactionService.calculateBalanceAgent(user_id);
 			Map<String, String> response = new HashMap<String, String>();
 			response.put("balance", String.valueOf(balance));

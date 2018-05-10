@@ -50,7 +50,7 @@ ApplicationListener<ContextRefreshedEvent> {
 	}
 
 	private void createMasterUserIfNotFound() {
-		User r = userRepository.findUserByUserId("paniki");
+		User r = userRepository.findUserByUserId("greg.laksono@gmail.com");
 		if(r == null){
 			Role adminRole = roleRepository.findByName("ROLE_ADMIN");
 			User user = new User();

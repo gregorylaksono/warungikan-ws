@@ -3,6 +3,7 @@ package org.warungikan.api.service;
 import java.io.Serializable;
 import java.util.List;
 
+import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
 
@@ -24,4 +25,6 @@ public interface IUserService {
 	public Long getPricePerKm(String agent);
 	public List<Role> getRoles(String userId);
 	public Boolean enableUser(String userId);
+	public AgentData getAgentData(String user_id);
+	public Boolean changeCoordinate(String user_id, Double lat, Double lng);
 }

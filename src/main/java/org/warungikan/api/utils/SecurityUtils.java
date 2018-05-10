@@ -3,6 +3,7 @@ package org.warungikan.api.utils;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.warungikan.api.config.SecurityConstants;
@@ -37,4 +38,5 @@ public class SecurityUtils {
 		
 		return username;
 	}
+	
 }

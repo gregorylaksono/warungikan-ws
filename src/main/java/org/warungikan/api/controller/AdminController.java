@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.warungikan.api.model.BasicResponse;
@@ -54,7 +55,7 @@ public class AdminController {
 		
 		if(roles != null){
 			User u = registerUser(user,price_per_km, roles);
-			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.ACCEPTED);			
 		}
 		else{
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User with id exists alread", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -69,12 +70,12 @@ public class AdminController {
 		return new ResponseEntity<User>(u, HttpStatus.OK);
 	}
 	
-	@PutMapping("/user/{user_id}")
+	@PutMapping("/user")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity updateUserById(@RequestBody User user, @PathVariable(value = "user_id", required = true) String user_id){
+	public ResponseEntity updateUserById(@RequestBody User user, @RequestParam(value = "user_id", required = true) String user_id){
 		User u = userService.update(user_id,user);
 		if(u!=null){
-			return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.ACCEPTED);
 		}else{
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User with id exists alread", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -84,7 +85,7 @@ public class AdminController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity deleteUserById(@PathVariable(value = "user_id", required = true) String user_id){
 		User u = userService.delete(user_id);
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is deleted", "SUCCESS", u.getEmail()), HttpStatus.OK);
+		return new ResponseEntity<BasicResponse>(new BasicResponse("User is deleted", "SUCCESS", u.getEmail()), HttpStatus.ACCEPTED);
 	}
 
 

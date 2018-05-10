@@ -23,9 +23,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.warungikan.api.model.BasicResponse;
 import org.warungikan.api.model.ChangePassword;
+import org.warungikan.api.model.request.VLatLng;
 import org.warungikan.api.service.IUserService;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.SecurityUtils;
+import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.User;
 import org.warungikan.db.repository.UserRepository;
@@ -44,33 +46,41 @@ public class UserController {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User u = userService.registerUser(user);
 		if(u != null){
-			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.OK);			
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.ACCEPTED);			
 		}
 		else{
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User with id exists already", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@GetMapping("/user/{user_id}")
+	@GetMapping("/user")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity getMyData(@PathVariable(value = "user_id", required=true) String user_id, HttpServletRequest request){
-	    String token = request.getHeader(Constant.HEADER_STRING);
-	    String username = SecurityUtils.getUsernameByToken(token);
-	    
-		User u = userService.getUserById(user_id);
-		if(username.equals(u.getEmail())){
-			return new ResponseEntity<User>(u, HttpStatus.OK);	
-		}
-		else{
-			return new ResponseEntity<User>(u, HttpStatus.NOT_FOUND);	
+	public ResponseEntity getMyData(HttpServletRequest request){
+		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+			User u = userService.getUserById(user_id);
+			return new ResponseEntity<User>(u, HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Can not retrieve user","FAILED",""), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	@PutMapping("/user/{user_id}")
+	
+	@PutMapping("/user")
 	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity updateUserById(@RequestParam(value = "user_id", required = true) String user_id, @RequestBody User user){
-		User u = userService.update(user_id,user);
-		return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.OK);
+	public ResponseEntity updateUserById( @RequestBody User user, HttpServletRequest request){
+		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+			User u = userService.update(user_id,user);
+			if(u != null){
+				return new ResponseEntity<BasicResponse>(new BasicResponse("User is updated", "SUCCESS", u.getEmail()), HttpStatus.ACCEPTED);
+			}else{
+				return new ResponseEntity<BasicResponse>(new BasicResponse("Can not update user","FAILED",""), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}catch(Exception e){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Can not update user","FAILED",""), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@PutMapping("/user/enable")
@@ -80,7 +90,7 @@ public class UserController {
 			String token = request.getHeader(Constant.HEADER_STRING);
 			String user_id = SecurityUtils.getUsernameByToken(token);
 			if(userService.enableUser(user_id)){
-				return new ResponseEntity<BasicResponse>(new BasicResponse("User is enabled", "SUCCESS", ""), HttpStatus.OK);
+				return new ResponseEntity<BasicResponse>(new BasicResponse("User is enabled", "SUCCESS", ""), HttpStatus.ACCEPTED);
 			}else{
 				return new ResponseEntity<BasicResponse>(new BasicResponse("User can not be enabled", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -95,11 +105,40 @@ public class UserController {
 		Boolean result = userService.changePassword(user_id, chPassword.getPassword(),
 				passwordEncoder.encode(chPassword.getNewPassword()));
 		if(result){
-			return new ResponseEntity<BasicResponse>(new BasicResponse("Password is updated", "SUCCESS", String.valueOf(result)), HttpStatus.OK);
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Password is updated", "SUCCESS", String.valueOf(result)), HttpStatus.ACCEPTED);
 		}else{
-			return new ResponseEntity<BasicResponse>(new BasicResponse("Old password is wrong", "FAILED", String.valueOf(result)), HttpStatus.OK);
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Old password is wrong", "FAILED", String.valueOf(result)), HttpStatus.ACCEPTED);
 		}
 	}
 	
+	@GetMapping("/user/data")
+	@PreAuthorize("hasRole('ROLE_AGENT')")
+	public ResponseEntity getAgentData(HttpServletRequest request){
+		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+			AgentData agent = userService.getAgentData(user_id);
+			return new ResponseEntity<AgentData>(agent, HttpStatus.ACCEPTED);
+		}catch(Exception e){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Can not retrieve agent data", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
+	@PutMapping("/user/coordinate")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
+	public ResponseEntity changeLocation(HttpServletRequest request, @RequestBody VLatLng coordinate){
+		try{
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+			Boolean result = userService.changeCoordinate(user_id, Double.parseDouble(coordinate.getLat()), Double.parseDouble(coordinate.getLng()));
+			if(result){
+				return new ResponseEntity<BasicResponse>(new BasicResponse("Coordinate is updated", "SUCCESS", String.valueOf(result)), HttpStatus.ACCEPTED);
+			}else{
+				return new ResponseEntity<BasicResponse>(new BasicResponse("Coordinate can not be updated", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}catch(Exception e){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Coordinate can not be updated", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+	}
 }

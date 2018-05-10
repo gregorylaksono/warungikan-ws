@@ -194,15 +194,15 @@ public class UserServiceImpl implements IUserService{
 			User u = userRepository.findUserByUserId(user_id);
 			u.setLastModifiedDate(new Date());
 			u.setAddress(user.getAddress());
-			u.setAddressInfo(user.getAddressInfo());
-			u.setCity(user.getCity());
 			u.setEmail(user.getEmail());
-			u.setEnable(user.getEnable());
-			u.setLatitude(user.getLatitude());
-			u.setLongitude(user.getLongitude());
 			u.setName(user.getName());
-			u.setPassword(user.getPassword());
-			u.setRoles(getRoles(user.getRoles()));
+//			u.setAddressInfo(user.getAddressInfo());
+//			u.setCity(user.getCity());
+//			u.setEnable(user.getEnable());
+//			u.setLatitude(user.getLatitude());
+//			u.setLongitude(user.getLongitude());
+//			u.setPassword(user.getPassword());
+//			u.setRoles(getRoles(user.getRoles()));
 			u.setTelpNo(user.getTelpNo());
 			return userRepository.save(u);			
 		}
@@ -308,6 +308,26 @@ public class UserServiceImpl implements IUserService{
 			return false;
 		}
 			}
+
+	@Override
+	public AgentData getAgentData(String user_id) {
+		User user = userRepository.findUserByUserId(user_id);
+		AgentData agent = agentDataRepository.findDataByUser(user);
+		return agent;
+	}
+
+	@Override
+	public Boolean changeCoordinate(String user_id, Double lat, Double lng) {
+		try{
+			User user = userRepository.findUserByUserId(user_id);
+			user.setLatitude(lat);
+			user.setLongitude(lng);
+			userRepository.save(user);
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+	}
 
 
 }

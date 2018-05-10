@@ -42,7 +42,7 @@ public class EmailConfig {
 	public JavaMailSender getJavaMailSender() throws UnsupportedEncodingException, Exception {
 	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 	    mailSender.setHost("smtp.gmail.com");
-	    mailSender.setPort(587);
+	    mailSender.setPort(Integer.parseInt(port));
 
 	    String password = decrypt(encrypted_password.getBytes("UTF-8"), Constant.ENC_KEY);
 	    mailSender.setUsername(username);
