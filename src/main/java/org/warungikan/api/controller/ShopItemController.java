@@ -89,12 +89,15 @@ public class ShopItemController {
 		}
 	}
 
-	@PostMapping("/stock/{shop_id}/{user_id}/{amount}")
+	@PostMapping("/stock/{shop_id}/{amount}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity addStock(@PathVariable(value = "shop_id", required=true) String itemId, 
-			@PathVariable(value = "user_id", required=true) String user_id, 
-			@PathVariable(value = "amount", required=true) Integer amount ) {
+								   @PathVariable(value = "amount", required=true) Integer amount,
+								   HttpServletRequest request) 
+	{
 		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
 			ShopItemStock stockAdded = shopService.addStock(itemId, user_id, amount);
 			return new ResponseEntity(stockAdded, HttpStatus.ACCEPTED);
 		}catch(Exception e) {
