@@ -41,7 +41,7 @@ public class UserController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	@PostMapping("/user")
+	@PostMapping("/user/register")
 	public ResponseEntity register(@RequestBody User user){
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User u = userService.registerUser(user);
@@ -53,8 +53,20 @@ public class UserController {
 		}
 	}
 	
+	
+	@GetMapping("/user/verify")
+	public ResponseEntity verify(@RequestParam(value = "verification_id", required = true) String verification_id){
+		if(userService.enableUser(verification_id)){
+			return new ResponseEntity<BasicResponse>(new BasicResponse("User is successfull verified", "SUCCESS", ""), HttpStatus.ACCEPTED);			
+		}
+		else{
+			return new ResponseEntity<BasicResponse>(new BasicResponse("Can not verify user", "FAILED", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
 	@GetMapping("/user")
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 	public ResponseEntity getMyData(HttpServletRequest request){
 		try{
 			String token = request.getHeader(Constant.HEADER_STRING);

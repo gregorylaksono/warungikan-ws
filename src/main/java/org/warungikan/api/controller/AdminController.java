@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -97,7 +98,7 @@ public class AdminController {
 	}
 	
 	public User registerUser(User user, String price_per_km, Role roles){
-				user.setPassword(passwordEncoder.encode(user.getPassword()));
+		
 		return userService.registerUser(user, Arrays.asList(new String[]{roles.getName()}), price_per_km);
 	}
 	

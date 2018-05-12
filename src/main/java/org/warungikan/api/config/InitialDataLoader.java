@@ -29,28 +29,23 @@ ApplicationListener<ContextRefreshedEvent> {
 	@Autowired
 	private RoleRepository roleRepository;
 
-
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	@Transactional
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-
 		if (alreadySetup)
 			return;
-		
 		createRoleIfNotFound("ROLE_ADMIN");
 		createRoleIfNotFound("ROLE_USER");
 		createRoleIfNotFound("ROLE_AGENT");
-
 		createMasterUserIfNotFound();
-
 		alreadySetup = true;
 	}
 
 	private void createMasterUserIfNotFound() {
-		User r = userRepository.findUserByUserId("greg.laksono@gmail.com");
+		User r = userRepository.findUserByUserId("greg@laksono.com");
 		if(r == null){
 			Role adminRole = roleRepository.findByName("ROLE_ADMIN");
 			User user = new User();
@@ -65,7 +60,7 @@ ApplicationListener<ContextRefreshedEvent> {
 			user.setLongitude(0d);
 			user.setTelpNo("no-value");
 			user.setPassword(passwordEncoder.encode("gregory1234"));
-			user.setEmail("greg.laksono@gmail.com");
+			user.setEmail("greg@laksono.com");
 			user.setRoles(Arrays.asList(adminRole));
 			user.setEnable(true);
 			userRepository.save(user);					

@@ -35,6 +35,7 @@ public class ShopItemServiceImpl implements IShopItemService{
 	public ShopItem createShopItem(String name, String description, String url, String price) {
 		ShopItem i = new ShopItem();
 		i.setCreationDate(new Date());
+		i.setIsEnable(true);
 		return shopRepository.save(setValue(i, name, description, url, price));
 	}
 

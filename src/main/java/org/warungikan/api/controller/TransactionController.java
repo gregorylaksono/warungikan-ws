@@ -1,5 +1,6 @@
 package org.warungikan.api.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,14 +43,16 @@ public class TransactionController {
 	@Autowired
 	private ITransactionService transactionService;
 	
-	@PostMapping("/balance/{user_id}/{balance}")
+	@PostMapping("/balance")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity addBalanceUser(@PathVariable( value = "user_id", required = true) String user_id,
-										 @PathVariable(value = "balance", required = true) String balance){
+	public ResponseEntity addBalanceUser(@RequestParam(value = "user_id", required = true) String user_id,
+										@RequestParam(value = "balance", required = true) String balance,
+										@RequestParam(value = "topup_date", required = true) @DateTimeFormat(pattern="dd-MM-yyyy HH:mm") Date topupDate,
+										@RequestParam(value = "ref_bank_no", required = true) String refbankNo){
 		Long bal = null;
 		try{
 			bal = Long.parseLong(balance);
-			Boolean result = userService.addBalance(user_id, bal);
+			Boolean result = userService.addBalance(user_id, bal,topupDate, refbankNo);
 			if(result){
 				return new ResponseEntity<BasicResponse>(new BasicResponse("Balance is added", "SUCCESS", ""), HttpStatus.ACCEPTED);
 			}else{

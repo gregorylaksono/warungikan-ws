@@ -1,6 +1,7 @@
 package org.warungikan.api.service;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import org.warungikan.db.model.AgentData;
@@ -20,11 +21,11 @@ public interface IUserService {
 	public User update(String user_id, User user);
 	public User delete(String user_id);
 	public Boolean changePassword(String user_id, String password, String newPassword);
-	public Boolean addBalance(String user_id, Long amount);
+	public Boolean addBalance(String user_id, Long amount, Date topupDate, String refNo);
 	public User registerUser(User user);
 	public Long getPricePerKm(String agent);
 	public List<Role> getRoles(String userId);
-	public Boolean enableUser(String userId);
+	public Boolean enableUser(String verification_id);
 	public AgentData getAgentData(String user_id);
 	public Boolean changeCoordinate(String user_id, Double lat, Double lng);
 }

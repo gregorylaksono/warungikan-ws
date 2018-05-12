@@ -2,6 +2,7 @@ package id.travel.api.test.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -100,7 +101,7 @@ public class ServiceTest {
 		Assert.assertTrue(customer.getEnable());
 		
 		//Add balance to customer Rp. 500.000
-		Boolean topupSuccess = userService.addBalance(u.getEmail(), 500000L);
+		Boolean topupSuccess = userService.addBalance(u.getEmail(), new Long(500000), new Date(), "GR-123333");
 		Assert.assertNotNull(customer);
 		Assert.assertTrue(topupSuccess);
 		customer = userService.getUserById("customer1");

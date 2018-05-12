@@ -1,5 +1,6 @@
 package org.warungikan.api.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,10 +14,12 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.warungikan.api.config.EmailConfig;
 import org.warungikan.api.service.IUserService;
@@ -24,6 +27,7 @@ import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.TopupWalletHistory;
+import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.User;
 import org.warungikan.db.repository.AgentDataRepository;
 import org.warungikan.db.repository.RoleRepository;
@@ -37,25 +41,25 @@ public class UserServiceImpl implements IUserService{
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 	@Autowired
 	private TopupWalletRepository topUpWalletRepository;
-	
+
 	@Autowired
 	private AgentDataRepository agentDataRepository;
-	
+
 	@Autowired
 	private JavaMailSender mailSender;
-	
+
 	@Autowired
 	private EmailConfig config;
-	
+
 	@Override
 	public User login(String email, String password) {
-		
+
 		return null;
 	}
 
@@ -68,6 +72,9 @@ public class UserServiceImpl implements IUserService{
 			return null;
 		}
 		if(!isUserIdExist(user.getEmail())){
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			String password  = user.getPassword();
+			if(password != null) user.setPassword(passwordEncoder.encode(password));
 			List<Role> rolesDb = roleRepository.findRolesByArrayName(roles);
 			user.setCreationDate(new Date());
 			user.setEnable(false);
@@ -75,8 +82,7 @@ public class UserServiceImpl implements IUserService{
 			user.addAllRole(rolesDb);
 			String random_confirmation_key = generateRandomConfirmationKey();
 			user.setRandomConfirmationKey(random_confirmation_key);
-			user = userRepository.save(user);
-			sendMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey());
+
 			if(pricePerKm != null){
 				Long.parseLong(pricePerKm);
 				AgentData d = new AgentData();
@@ -85,44 +91,52 @@ public class UserServiceImpl implements IUserService{
 				String json = new Gson().toJson(data);
 				d.setData(json);
 				d.setAgent(user);
+				String generatedPwd = RandomStringUtils.randomAlphabetic(10);
+				user.setPassword(passwordEncoder.encode(generatedPwd));
+
+				user = userRepository.save(user);
 				agentDataRepository.save(d);
+//				sendAgentMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey(), generatedPwd);
+			}else{
+				user = userRepository.save(user);
+				sendUserMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey());
 			}
 			return user;
 		}else{
 			return null;
 		}
-		
-	}
-	
-	
 
-	private void sendMessage(User user, String link) {
+	}
+
+
+
+	private void sendUserMessage(User user, String link) {
 		String name = user.getName();
 		String htmlMessage = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"+
-							 "<html lang=\"en\">"+
-							 "<head>"+
-							 "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"+
-							 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"+
-							 "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"+
-							 "<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">"+
-							 "<title></title>"+
-							 "<style type=\"text/css\">"+
-							 ".logo{display:block;width:100%;}"+
-							 ".message{width:700px;margin:0 auto;}"+
-							 "p{font-family: 'Roboto', sans-serif;}"+
-							 "</style>"+
-							 "</head>"+
-							 "<body style=\"margin:0; padding:0; background-color:#F2F2F2;\">"+
-							 "<img src=\"http://warungikan.com/images/headweb3.png\" class=\"logo\">"+
-							 "<div class=\"message\">"+
-							 "<p>Hi "+name+",</p>"+
-							 "<p>Selamat datang di warungikan.com. Terima kasih telah mendaftar di toko kami. Pendaftaran anda hampir selesai. Kunjungi <a href=\" \">link ini</a> sebagai konfirmasi pendaftaran anda</p>"+
-							 "<br>"+
-							 "<p>Best regards,</p>"+
-							 "<p>WarungIkan admin</p>"+
-							 "</div>"+
-							 "</body>"+
-							 "</html>";
+				"<html lang=\"en\">"+
+				"<head>"+
+				"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"+
+				"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"+
+				"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"+
+				"<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">"+
+				"<title></title>"+
+				"<style type=\"text/css\">"+
+				".logo{display:block;width:100%;}"+
+				".message{width:700px;margin:0 auto;}"+
+				"p{font-family: 'Roboto', sans-serif;}"+
+				"</style>"+
+				"</head>"+
+				"<body style=\"margin:0; padding:0; background-color:#F2F2F2;\">"+
+				"<img src=\"http://warungikan.com/images/headweb3.png\" class=\"logo\">"+
+				"<div class=\"message\">"+
+				"<p>Hi "+name+",</p>"+
+				"<p>Selamat datang di warungikan.com. Terima kasih telah mendaftar di toko kami. Pendaftaran anda hampir selesai. Kunjungi <a href=\""+link+"\">link ini</a> sebagai konfirmasi pendaftaran anda</p>"+
+				"<br>"+
+				"<p>Best regards,</p>"+
+				"<p>WarungIkan admin</p>"+
+				"</div>"+
+				"</body>"+
+				"</html>";
 		MimeMessagePreparator preparator = new MimeMessagePreparator(){
 
 			@Override
@@ -132,14 +146,64 @@ public class UserServiceImpl implements IUserService{
 				msg.setSubject("Konfirmasi email anda");
 				msg.setFrom("admin@warungikan.com");
 				msg.setText(htmlMessage, true);
-				
+
 			}
-			
+
 		};
 		try{
 			mailSender.send(preparator);
 		}catch(Exception e){
-			
+
+		}
+	}
+
+	private void sendAgentMessage(User user, String link, String password) {
+		String name = user.getName();
+		String htmlMessage = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"+
+				"<html lang=\"en\">"+
+				"<head>"+
+				"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"+
+				"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"+
+				"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"+
+				"<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">"+
+				"<title></title>"+
+				"<style type=\"text/css\">"+
+				".logo{display:block;width:100%;}"+
+				".message{width:700px;margin:0 auto;}"+
+				"p{font-family: 'Roboto', sans-serif;}"+
+				"</style>"+
+				"</head>"+
+				"<body style=\"margin:0; padding:0; background-color:#F2F2F2;\">"+
+				"<img src=\"http://warungikan.com/images/headweb3.png\" class=\"logo\">"+
+				"<div class=\"message\">"+
+				"<p>Hi "+name+",</p>"+
+				"<p>Selamat datang di warungikan.com. Terima kasih telah mendaftar di toko kami. Pendaftaran anda hampir selesai. Kunjungi <a href=\""+link+"\">link ini</a> sebagai konfirmasi pendaftaran anda. Berikut login data anda:</p>"+
+				"<pre> Username:"+user.getEmail()+
+				"<pre> Password:"+password+
+				"<pre> Ubah password anda secepatnya. Demi keamanan anda"+
+				"<br>"+
+				"<p>Best regards,</p>"+
+				"<p>WarungIkan admin</p>"+
+				"</div>"+
+				"</body>"+
+				"</html>";
+		MimeMessagePreparator preparator = new MimeMessagePreparator(){
+
+			@Override
+			public void prepare(MimeMessage mimeMessage) throws Exception {
+				MimeMessageHelper msg = new MimeMessageHelper(mimeMessage);
+				msg.setTo(user.getEmail());
+				msg.setSubject("Konfirmasi email anda");
+				msg.setFrom("admin@warungikan.com");
+				msg.setText(htmlMessage, true);
+
+			}
+
+		};
+		try{
+			mailSender.send(preparator);
+		}catch(Exception e){
+
 		}
 	}
 
@@ -155,7 +219,7 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User generateUserId() {
-		
+
 		return null;
 	}
 
@@ -196,19 +260,19 @@ public class UserServiceImpl implements IUserService{
 			u.setAddress(user.getAddress());
 			u.setEmail(user.getEmail());
 			u.setName(user.getName());
-//			u.setAddressInfo(user.getAddressInfo());
-//			u.setCity(user.getCity());
-//			u.setEnable(user.getEnable());
-//			u.setLatitude(user.getLatitude());
-//			u.setLongitude(user.getLongitude());
-//			u.setPassword(user.getPassword());
-//			u.setRoles(getRoles(user.getRoles()));
+			//			u.setAddressInfo(user.getAddressInfo());
+			//			u.setCity(user.getCity());
+			//			u.setEnable(user.getEnable());
+			//			u.setLatitude(user.getLatitude());
+			//			u.setLongitude(user.getLongitude());
+			//			u.setPassword(user.getPassword());
+			//			u.setRoles(getRoles(user.getRoles()));
 			u.setTelpNo(user.getTelpNo());
 			return userRepository.save(u);			
 		}
 		return null;
 	}
-	
+
 	private List<Role> getRoles(Collection<Role> roles){
 		List<Role> r = new ArrayList();
 		for(Role s : roles){
@@ -217,7 +281,7 @@ public class UserServiceImpl implements IUserService{
 		}
 		return r;
 	}
-	
+
 	private boolean isUserIdExist(String user_id){
 		User u = userRepository.findUserByUserId(user_id);
 		return (u != null);
@@ -231,9 +295,9 @@ public class UserServiceImpl implements IUserService{
 			user.setLastModifiedDate(new Date());			
 			return userRepository.save(user);
 		}
-		
+
 		return null;
-		
+
 	}
 
 	@Override
@@ -249,7 +313,7 @@ public class UserServiceImpl implements IUserService{
 	}
 
 	@Override
-	public Boolean addBalance(String user_id, Long amount) {
+	public Boolean addBalance(String user_id, Long amount, Date topupDate, String refNo) {
 		User u = userRepository.findUserByUserId(user_id);
 		if(u!=null){
 			List<Role> roles = roleRepository.findRoleByUser(user_id);
@@ -257,6 +321,9 @@ public class UserServiceImpl implements IUserService{
 				TopupWalletHistory t = new TopupWalletHistory();
 				t.setAmount(amount);
 				t.setUser(u);
+				t.setTop_up_id(generateTopupId(u));
+				t.setReferenceBankNo(refNo);
+				t.setTopupDate(topupDate);
 				t.setCreationDate(new Date());
 				u.setBalance(u.getBalance() + amount);
 				topUpWalletRepository.save(t);
@@ -267,13 +334,31 @@ public class UserServiceImpl implements IUserService{
 		return false;
 	}
 
+	private String generateTopupId(User customer) {
+		String ab = "TP"+customer.getName().substring(0,2).toUpperCase();
+		String random = String.valueOf(new BigDecimal(Math.random() * 1000000)).substring(0,8).replace(".", "");
+		String topupId = ab+"-"+random;
+		Boolean isAvailable = false;
+		while(!isAvailable){
+			TopupWalletHistory t = topUpWalletRepository.findTopupByTopupId(topupId);
+			if(t == null){
+				isAvailable = true;
+			}else{
+				random = String.valueOf(new BigDecimal(Math.random() * 1000000)).substring(0,8).replace(".", "");
+				topupId = ab+"-"+random;
+			}
+		}
+
+		return topupId;
+	}
+
 	@Override
 	public User registerUser(User user) {
 		Role r = getRoleByName("ROLE_USER");
-		
+
 		user.setBalance(0l).addRole(r).
 		setEnable(true).setCreationDate(new Date());
-		
+
 		return userRepository.save(user);
 	}
 
@@ -297,9 +382,10 @@ public class UserServiceImpl implements IUserService{
 	}
 
 	@Override
-	public Boolean enableUser(String userId) {
+	public Boolean enableUser(String veification_id) {
 		try{
-			User user = userRepository.findUserByUserId(userId);
+			User user = userRepository.findUserByConfirmationKey(veification_id);
+			if(user == null) return false;
 			user.setEnable(true);
 			user.setLastModifiedDate(new Date());
 			userRepository.save(user);
@@ -307,7 +393,7 @@ public class UserServiceImpl implements IUserService{
 		}catch(Exception e){
 			return false;
 		}
-			}
+	}
 
 	@Override
 	public AgentData getAgentData(String user_id) {
