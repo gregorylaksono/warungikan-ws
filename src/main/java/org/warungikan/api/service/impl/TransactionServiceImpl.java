@@ -402,8 +402,16 @@ public class TransactionServiceImpl implements ITransactionService {
 			}
 		}
 		
-		
+		if(stocks.size() > 6){
+			stocks = stocks.subList(0, 5);
+		}
 		return stocks;
+	}
+	@Override
+	public List<TransactionDetail> getTransactionDetail(String trxId) {
+		Transaction trx = transactionRepository.findOne(Long.parseLong(trxId));
+		List<TransactionDetail> list = trxDetailRepository.findTransactionDetailByTransactionId(trx);
+		return list;
 	}
 
 

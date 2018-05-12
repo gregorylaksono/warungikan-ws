@@ -56,4 +56,6 @@ public interface ITransactionService {
 	public Boolean isCustomerLegitimateForTransaction(String customer_id, String agent, String totalKm, Set<TransactionDetail> details);
 
 	public List<AgentStock> getAgentBasedCustomerLocation(Set<TransactionDetail> details, String customer_id);
+	
+	public List<TransactionDetail> getTransactionDetail(String trxId);
 }
