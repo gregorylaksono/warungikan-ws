@@ -26,6 +26,7 @@ import org.warungikan.api.service.ITransactionService;
 import org.warungikan.api.service.IUserService;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.SecurityUtils;
+import org.warungikan.db.model.TopupWalletHistory;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
@@ -256,5 +257,38 @@ public class TransactionController {
 		}
 	}
 	
+	@GetMapping("/all")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity getAllTransaction() {
+		try {
+			 List<Transaction> trx = transactionService.getAllTransactions();
+			 return new ResponseEntity(trx, HttpStatus.ACCEPTED);	
+		}catch(Exception e) {
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
 	
+	@GetMapping("/topup")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity getAlltopup() {
+		try {
+			 List<TopupWalletHistory> topups = transactionService.getAllTopupHistory();
+			 return new ResponseEntity(topups, HttpStatus.ACCEPTED);	
+		}catch(Exception e) {
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/topup/user")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity getAlltopup(HttpServletRequest request) {
+		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String customer_id = SecurityUtils.getUsernameByToken(token);
+		    List<TopupWalletHistory> topups = transactionService.getTopupHistoryByUser(customer_id);
+			return new ResponseEntity(topups, HttpStatus.ACCEPTED);	
+		}catch(Exception e) {
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
 }

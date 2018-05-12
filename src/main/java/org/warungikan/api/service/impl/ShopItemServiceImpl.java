@@ -28,7 +28,7 @@ public class ShopItemServiceImpl implements IShopItemService{
 	@Override
 	public List<ShopItem> getAllShopItem() {
 
-		return shopRepository.findAll();
+		return shopRepository.findAllShopItems();
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.warungikan.api.model.response.AgentStock;
+import org.warungikan.db.model.TopupWalletHistory;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
@@ -58,4 +59,10 @@ public interface ITransactionService {
 	public List<AgentStock> getAgentBasedCustomerLocation(Set<TransactionDetail> details, String customer_id);
 	
 	public List<TransactionDetail> getTransactionDetail(String trxId);
+
+	public List<Transaction> getAllTransactions();
+	
+	public List<TopupWalletHistory> getAllTopupHistory();
+	
+	public List<TopupWalletHistory> getTopupHistoryByUser(String user_id);
 }

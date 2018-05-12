@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -87,8 +88,9 @@ public class TransactionServiceImpl implements ITransactionService {
 		}
 		
 		Transaction t = new Transaction();
+		String trxId = generateTrxId(agent);
 		t.setAgent(agent).setCustomer(customer).setTransportPrice(transportPrice).
-		setTotalPrice(totalPrice).setCreationDate(new Date());
+		setTotalPrice(totalPrice).setTransactionId(trxId).setCreationDate(new Date());
 //		setTransactionDetails(details).setTotalPrice(totalPrice).setCreationDate(new Date());
 		t = transactionRepository.save(t);
 		try{
@@ -121,6 +123,34 @@ public class TransactionServiceImpl implements ITransactionService {
 		
 	
 		return t;
+	}
+	private String generateTrxId(User agent) {
+		String ab = agent.getName().substring(0,2).toUpperCase();
+		String random = String.valueOf(new BigDecimal(Math.random() * 100000000)).substring(0,8).replace(".", "");
+		String trxId = ab+"-"+random;
+		Boolean isAvailable = false;
+		while(!isAvailable){
+			Transaction t = transactionRepository.findTransactionByTrxId(trxId);
+			if(t == null){
+				isAvailable = true;
+			}else{
+				random = String.valueOf(new BigDecimal(Math.random() * 100000000)).substring(0,8).replace(".", "");
+				trxId = ab+"-"+random;
+			}
+		}
+		
+		return trxId;
+	}
+	private static String generaterandom() {
+		String ab = "GR";
+		String random = String.valueOf(new BigDecimal(Math.random() * 100000000)).substring(0,8).replace(".", "");
+		ab.toUpperCase();
+		return ab+"-"+random;
+	}
+	public static void main(String[] args) {
+		for(int i=0; i<100; i++){
+			System.out.println(generaterandom());
+		}
 	}
 	@Override
 	public Boolean isCustomerLegitimateForTransaction(String customer_id, String agent, String totalKm, Set<TransactionDetail> details) {
@@ -412,6 +442,21 @@ public class TransactionServiceImpl implements ITransactionService {
 		Transaction trx = transactionRepository.findOne(Long.parseLong(trxId));
 		List<TransactionDetail> list = trxDetailRepository.findTransactionDetailByTransactionId(trx);
 		return list;
+	}
+	@Override
+	public List<Transaction> getAllTransactions() {
+	
+		return transactionRepository.findAll();
+	}
+	@Override
+	public List<TopupWalletHistory> getAllTopupHistory() {
+		
+		return topupWalletRepository.findAll();
+	}
+	@Override
+	public List<TopupWalletHistory> getTopupHistoryByUser(String user_id) {
+		User customer = userRepository.findUserByUserId(user_id);
+		return topupWalletRepository.findTopupsWalletByUser(customer);
 	}
 
 
