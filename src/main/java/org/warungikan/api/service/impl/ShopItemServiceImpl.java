@@ -32,25 +32,26 @@ public class ShopItemServiceImpl implements IShopItemService{
 	}
 
 	@Override
-	public ShopItem createShopItem(String name, String description, String url, String price) {
+	public ShopItem createShopItem(String name, String description, String url, String price, String weight) {
 		ShopItem i = new ShopItem();
 		i.setCreationDate(new Date());
 		i.setIsEnable(true);
-		return shopRepository.save(setValue(i, name, description, url, price));
+		return shopRepository.save(setValue(i, name, description, url, price, weight));
 	}
 
 	@Override
-	public ShopItem updateShopItem(String id, String name, String description, String url, String price) {
+	public ShopItem updateShopItem(String id, String name, String description, String url, String price, String weight) {
 		ShopItem i = shopRepository.findOne(Long.parseLong(id));
 		i.setLastModifiedDate(new Date());
-		return shopRepository.save(setValue(i, name, description, url, price));
+		return shopRepository.save(setValue(i, name, description, url, price, weight));
 	}
 	
-	private ShopItem setValue(ShopItem i, String name, String description, String url, String price){
+	private ShopItem setValue(ShopItem i, String name, String description, String url, String price, String weight){
 		i.setDescription(description);
 		i.setName(name);
 		i.setPrice(Long.parseLong(price));
 		i.setUrl(url);
+		i.setWeight(Integer.parseInt(weight));
 		return i;
 	}
 

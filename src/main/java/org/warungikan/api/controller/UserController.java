@@ -43,7 +43,7 @@ public class UserController {
 
 	@PostMapping("/user/register")
 	public ResponseEntity register(@RequestBody User user){
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
+//		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User u = userService.registerUser(user);
 		if(u != null){
 			return new ResponseEntity<BasicResponse>(new BasicResponse("User is registered", "SUCCESS", u.getEmail()), HttpStatus.ACCEPTED);			

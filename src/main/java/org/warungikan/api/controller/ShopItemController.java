@@ -52,7 +52,7 @@ public class ShopItemController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity createShopItem(@RequestBody VShopItem s){
 		try {
-			ShopItem shopItem = shopService.createShopItem(s.getName(), s.getDescription(), s.getUrl(), s.getPrice());
+			ShopItem shopItem = shopService.createShopItem(s.getName(), s.getDescription(), s.getUrl(), s.getPrice(), s.getWeight());
 			if(shopItem != null) {
 				return new ResponseEntity(shopItem, HttpStatus.ACCEPTED);
 			}else {
@@ -67,7 +67,7 @@ public class ShopItemController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity editShopItem(@RequestBody VShopItem s){
 		try {
-			ShopItem shopItem = shopService.updateShopItem(s.getShopId(), s.getName(), s.getDescription(), s.getUrl(), s.getPrice());
+			ShopItem shopItem = shopService.updateShopItem(s.getShopId(), s.getName(), s.getDescription(), s.getUrl(), s.getPrice(), s.getWeight());
 			if(shopItem != null) {
 				return new ResponseEntity(shopItem, HttpStatus.ACCEPTED);
 			}else {
@@ -79,7 +79,7 @@ public class ShopItemController {
 	}
 
 	@GetMapping("/item")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 	public ResponseEntity getShopItem() {
 		try {
 			List<ShopItem> items = shopService.getAllShopItem();

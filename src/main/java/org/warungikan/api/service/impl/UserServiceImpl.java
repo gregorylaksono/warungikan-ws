@@ -2,6 +2,7 @@ package org.warungikan.api.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +97,7 @@ public class UserServiceImpl implements IUserService{
 
 				user = userRepository.save(user);
 				agentDataRepository.save(d);
-//				sendAgentMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey(), generatedPwd);
+				sendAgentMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey(), generatedPwd);
 			}else{
 				user = userRepository.save(user);
 				sendUserMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey());
@@ -354,11 +355,8 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User registerUser(User user) {
-		Role r = getRoleByName("ROLE_USER");
 
-		user.setBalance(0l).addRole(r).
-		setEnable(true).setCreationDate(new Date());
-
+		registerUser(user, Arrays.asList(new String[]{"ROLE_USER"}), null);
 		return userRepository.save(user);
 	}
 

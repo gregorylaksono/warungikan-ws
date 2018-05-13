@@ -22,16 +22,16 @@ public class ShopItemControllerTest {
 		// Create user using admin role
 		try {
 			String jwt = userManager.login("greg.laksono@gmail.com", "gregory1234");
-			ShopItem shopItem1 = shopItemManager.createShopItem(jwt, "item1", "item1 description", "http://item1.test", "30000");
+			ShopItem shopItem1 = shopItemManager.createShopItem(jwt, "item1", "item1 description", "http://item1.test", "30000","300");
 			Assert.assertNotNull(shopItem1);
 			
-			ShopItem edit = shopItemManager.editShopItem(jwt, String.valueOf(shopItem1.getId()), "newName", "newDescription", "newUrl", "90000");
+			ShopItem edit = shopItemManager.editShopItem(jwt, String.valueOf(shopItem1.getId()), "newName", "newDescription", "newUrl", "90000","300");
 			Assert.assertEquals("newName", edit.getName());
 			Assert.assertEquals("newDescription", edit.getDescription());
 			Assert.assertEquals("newUrl", edit.getUrl());
 			Assert.assertEquals(new Long("90000").longValue(), edit.getPrice().longValue());
 			
-			ShopItem shopItem2 = shopItemManager.createShopItem(jwt, "item12", "item12 description", "http://item12.test", "90000");
+			ShopItem shopItem2 = shopItemManager.createShopItem(jwt, "item12", "item12 description", "http://item12.test", "90000","300");
 			List<ShopItem> items = shopItemManager.getShopItem(jwt);
 			Assert.assertEquals(2, items.size());
 			

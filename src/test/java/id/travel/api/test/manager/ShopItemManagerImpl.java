@@ -33,11 +33,11 @@ import id.travel.api.test.exception.WarungIkanNetworkException;
 public class ShopItemManagerImpl {
 
 	
-	public ShopItem createShopItem(String sessionId, String name,String description,String url, String price) throws WarungIkanNetworkException{
+	public ShopItem createShopItem(String sessionId, String name,String description,String url, String price, String weight) throws WarungIkanNetworkException{
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
-			VShopItem s = new VShopItem(name, description, url, price);
+			VShopItem s = new VShopItem(name, description, url, price, weight);
 			HttpEntity request = new HttpEntity<>(s,headers);
 			RestTemplate t = new RestTemplate();
 			ResponseEntity<ShopItem> response = t.postForEntity(new URI(Constant.WS_POST_CREATE_SHOP_ITEM_URL), request, ShopItem.class);
@@ -55,11 +55,11 @@ public class ShopItemManagerImpl {
 		}
 	}
 	
-	public ShopItem editShopItem(String sessionId, String shopId, String name,String description,String url, String price) throws WarungIkanNetworkException{
+	public ShopItem editShopItem(String sessionId, String shopId, String name,String description,String url, String price, String weight) throws WarungIkanNetworkException{
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Authorization", sessionId);
-			VShopItem s = new VShopItem(shopId, name, description, url, price);
+			VShopItem s = new VShopItem(shopId, name, description, url, price, weight);
 			HttpEntity request = new HttpEntity<>(s, headers);
 			RestTemplate t = new RestTemplate();
 			ResponseEntity<ShopItem> response = t.exchange(new URI(Constant.WS_PUT_UPDATE_SHOP_ITEM_URL),HttpMethod.PUT, request, ShopItem.class);

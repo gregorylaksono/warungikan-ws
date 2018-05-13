@@ -8,8 +8,8 @@ import org.warungikan.db.model.ShopItemStock;
 public interface IShopItemService {
 
 	public List<ShopItem> getAllShopItem();
-	public ShopItem createShopItem(String name, String description, String url, String price);
-	public ShopItem updateShopItem(String id, String name, String description, String url, String price);
+	public ShopItem createShopItem(String name, String description, String url, String price, String weight);
+	public ShopItem updateShopItem(String id, String name, String description, String url, String price, String weight);
 	public ShopItemStock addStock(String shopId, String user_id, Integer amount );
 	public List<ShopItemStock> getStockByAgent(String user_id);
 	public List<ShopItemStock> getAllStocks();

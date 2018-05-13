@@ -59,9 +59,9 @@ public class ServiceTest {
 		User agent3 = User.UserFactory("agent3", "agent3@mail.com", "33322", "5555", "city", "-6.200792", "106.815811", "pass");
 		agent3 = userService.registerUser(agent3, Arrays.asList(new String[] {"ROLE_USER","ROLE_AGENT"}), "3000");
 		
-		ShopItem item1 = shopItemService.createShopItem("item1", "item1desc", "http://sdsdas", "50000");
-		ShopItem item2 = shopItemService.createShopItem("item2", "item2desc", "http://sdsdas", "60000");
-		ShopItem item3 = shopItemService.createShopItem("item2", "item2desc", "http://sdsdas", "40000");
+		ShopItem item1 = shopItemService.createShopItem("item1", "item1desc", "http://sdsdas", "50000","300");
+		ShopItem item2 = shopItemService.createShopItem("item2", "item2desc", "http://sdsdas", "60000","300");
+		ShopItem item3 = shopItemService.createShopItem("item2", "item2desc", "http://sdsdas", "40000","300");
 		
 		ShopItemStock stock1 = shopItemService.addStock(String.valueOf(item1.getId()), agent.getEmail(), new Integer("5"));
 		ShopItemStock stock2 = shopItemService.addStock(String.valueOf(item2.getId()), agent.getEmail(), new Integer("10"));
@@ -117,8 +117,8 @@ public class ServiceTest {
 		Assert.assertTrue(agent.getEnable());
 		
 		//Create shop item
-		ShopItem item1 = shopItemService.createShopItem("item1", "item1desc", "https://", "30000");
-		ShopItem item2 = shopItemService.createShopItem("item2", "item2desc", "https://", "45000");
+		ShopItem item1 = shopItemService.createShopItem("item1", "item1desc", "https://", "30000","300");
+		ShopItem item2 = shopItemService.createShopItem("item2", "item2desc", "https://", "45000","300");
 		Assert.assertNotNull(item1);
 		Assert.assertNotNull(item2);
 		

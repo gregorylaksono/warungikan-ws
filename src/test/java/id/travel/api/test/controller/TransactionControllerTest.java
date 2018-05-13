@@ -97,9 +97,9 @@ public class TransactionControllerTest {
 			Assert.assertNotNull(agent2Jwt);
 
 			//Create shop item
-			ShopItem shopItem1 = shopItemManager.createShopItem(adminJwt, "item1", "item1description", "http://url1.com", "50000");
-			ShopItem shopItem2 = shopItemManager.createShopItem(adminJwt, "item2", "item2description", "http://url2.com", "75000");
-			ShopItem shopItem3 = shopItemManager.createShopItem(adminJwt, "item3", "item3description", "http://url3.com", "43000");
+			ShopItem shopItem1 = shopItemManager.createShopItem(adminJwt, "item1", "item1description", "http://url1.com", "50000","300");
+			ShopItem shopItem2 = shopItemManager.createShopItem(adminJwt, "item2", "item2description", "http://url2.com", "75000","300");
+			ShopItem shopItem3 = shopItemManager.createShopItem(adminJwt, "item3", "item3description", "http://url3.com", "43000","300");
 			Assert.assertNotNull(shopItem1);
 			Assert.assertNotNull(shopItem2);
 
