@@ -163,7 +163,7 @@ public class UserServiceImpl implements IUserService{
 
 		};
 		try{
-			getJavaMailSender().send(preparator);
+			mailSender.send(preparator);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -213,62 +213,13 @@ public class UserServiceImpl implements IUserService{
 
 		};
 		try{
-			getJavaMailSender().send(preparator);
+			mailSender.send(preparator);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-	public JavaMailSender getJavaMailSender() throws UnsupportedEncodingException, Exception {
-	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-	    mailSender.setHost("srv31.niagahoster.com");
-	    mailSender.setPort(Integer.parseInt("465"));
-	    
-	    String username = "admin@warungikan.com";
-	    String password = "@dm1n";
-	    mailSender.setUsername(username);
-	    mailSender.setPassword(password);
-	     
-	    Properties props = mailSender.getJavaMailProperties();
-	    props.put("mail.smtp.host", "srv31.niagahoster.com"); //SMTP Host
-		props.put("mail.smtp.port", "465"); //TLS Port
-		props.put("mail.smtp.auth", "true"); //enable authentication
-		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
-		props.put("mail.smtp.socketFactory.class",
-	            "javax.net.ssl.SSLSocketFactory");
-	    return mailSender;
-	}
 	
-	public static void main(String[] args) {
-		new UserServiceImpl().sendUserMessage(User.UserFactory("greg", "greg.laksono@gmail.com", "1234", "add", "test", "1.5548", "5.7789", "pwd"), "http://blabla");
-		
-	}
-	public static void sendEmail(Session session, String toEmail, String subject, String body){
-		try
-	    {
-	      MimeMessage msg = new MimeMessage(session);
-	      //set message headers
-	      msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-	      msg.addHeader("format", "flowed");
-	      msg.addHeader("Content-Transfer-Encoding", "8bit");
-
-	      msg.setFrom(new InternetAddress("admin@warungikan.com", "NoReply-JD"));
-
-	      msg.setReplyTo(InternetAddress.parse("admin@warungikan.com", false));
-	      msg.setSubject(subject, "UTF-8");
-	      msg.setText(body, "UTF-8");
-	      msg.setSentDate(new Date());
-	      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-	      System.out.println("Message is ready");
-    	  Transport.send(msg);  
-
-	      System.out.println("EMail Sent Successfully!!");
-	    }
-	    catch (Exception e) {
-	      e.printStackTrace();
-	    }
-	}
-
-	private String generateRandomConfirmationKey() {
+		private String generateRandomConfirmationKey() {
 		String random = UUID.randomUUID().toString()+UUID.randomUUID().toString().replace("-", "");
 		User u = userRepository.findUserByConfirmationKey(random);
 		while(u!=null){

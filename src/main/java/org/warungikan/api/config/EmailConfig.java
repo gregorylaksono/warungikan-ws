@@ -41,42 +41,37 @@ public class EmailConfig {
 	@Bean
 	public JavaMailSender getJavaMailSender() throws UnsupportedEncodingException, Exception {
 	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-	    mailSender.setHost("smtp.gmail.com");
+	    mailSender.setHost(host);
 	    mailSender.setPort(Integer.parseInt(port));
-
-	    String password = decrypt(encrypted_password.getBytes("UTF-8"), Constant.ENC_KEY);
+	    
 	    mailSender.setUsername(username);
-	    mailSender.setPassword(password);
+	    mailSender.setPassword(decrypt(encrypted_password, Constant.ENC_KEY));
 	     
 	    Properties props = mailSender.getJavaMailProperties();
-	    props.put("mail.transport.protocol", "smtp");
-	    props.put("mail.smtp.auth", "true");
-	    props.put("mail.smtp.starttls.enable", "true");
-	    props.put("mail.debug", "true");
-	     
+	    props.put("mail.smtp.host", host);
+		props.put("mail.smtp.port", port);
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.socketFactory.class",
+	            "javax.net.ssl.SSLSocketFactory");
 	    return mailSender;
 	}
 	
 	public static void main(String[] args) {
-		try {
-			System.out.println(UUID.randomUUID().toString().replace("-", ""));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	
-	private static String encrypt(byte[] bs, String encryptionKey) throws Exception {
+	private static String encrypt(String bs, String encryptionKey) throws Exception {
 		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding","SunJCE");
 		MessageDigest sha = MessageDigest.getInstance("SHA-1");
 		byte[] hashedPassword = sha.digest(encryptionKey.getBytes());
 		hashedPassword = Arrays.copyOf(hashedPassword, 16);
 		SecretKeySpec key = new SecretKeySpec(hashedPassword, "AES");
 		cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(Constant.IV.getBytes()));
-		return bytesToHex(cipher.doFinal(bs));
+		return bytesToHex(cipher.doFinal(bs.getBytes("UTF-8")));
 	}
 	
-	public static String decrypt(byte[] bs, String encryptionKey) throws Exception {
+	public static String decrypt(String bs, String encryptionKey) throws Exception {
 		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding","SunJCE");
 		MessageDigest sha = MessageDigest.getInstance("SHA-1");
 		byte[] hashedPassword = sha.digest(encryptionKey.getBytes("UTF-8"));
@@ -97,7 +92,8 @@ public class EmailConfig {
 	    }
 	    return new String(hexChars);
 	}
-
+	
+	
 	public String getUsername() {
 		return username;
 	}
