@@ -32,11 +32,11 @@ import org.warungikan.db.repository.UserRepository;
 @EnableJpaRepositories(basePackages = ("org.warungikan.db.repository"))
 @EntityScan(basePackages = "org.warungikan.db.model")
 @ComponentScan(basePackages="org.warungikan.api")
-public class TravelLauncher {
-	private static final Logger log = LoggerFactory.getLogger(TravelLauncher.class);
+public class Launcher {
+	private static final Logger log = LoggerFactory.getLogger(Launcher.class);
 
 	public static void main(String[] args) {
-        SpringApplication.run(TravelLauncher.class, args);
+        SpringApplication.run(Launcher.class, args);
 	}
 
 }

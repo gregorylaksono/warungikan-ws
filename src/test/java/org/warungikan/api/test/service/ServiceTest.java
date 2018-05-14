@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import org.warungikan.api.TravelLauncher;
+import org.warungikan.api.Launcher;
 import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.IShopItemService;
 import org.warungikan.api.service.ITransactionService;
@@ -32,7 +32,7 @@ import org.warungikan.db.model.User;
 import junit.framework.Assert;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= TravelLauncher.class)
+@SpringBootTest(classes= Launcher.class)
 @AutoConfigureTestDatabase(replace=Replace.NONE)
 @Transactional
 public class ServiceTest {
