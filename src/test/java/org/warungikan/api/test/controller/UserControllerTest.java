@@ -1,4 +1,4 @@
-package id.travel.api.test.controller;
+package org.warungikan.api.test.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.warungikan.api.TravelLauncher;
 import org.warungikan.api.service.IUserService;
+import org.warungikan.api.test.exception.UserSessionException;
+import org.warungikan.api.test.exception.WarungIkanNetworkException;
+import org.warungikan.api.test.manager.UserManagerImpl;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
 import org.warungikan.db.model.TopupWalletHistory;
@@ -30,10 +33,6 @@ import org.warungikan.db.repository.TopupWalletRepository;
 import org.warungikan.db.repository.TransactionStateRepository;
 import org.warungikan.db.repository.TransactionRepository;
 import org.warungikan.db.repository.UserRepository;
-
-import id.travel.api.test.exception.UserSessionException;
-import id.travel.api.test.exception.WarungIkanNetworkException;
-import id.travel.api.test.manager.UserManagerImpl;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes= TravelLauncher.class)
 @AutoConfigureTestDatabase(replace=Replace.NONE)

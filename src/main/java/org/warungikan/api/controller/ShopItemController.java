@@ -27,6 +27,8 @@ import org.warungikan.api.model.request.VShopItem;
 import org.warungikan.api.service.IShopItemService;
 import org.warungikan.api.service.IUserService;
 import org.warungikan.api.service.impl.ShopItemServiceImpl;
+import org.warungikan.api.test.exception.UserSessionException;
+import org.warungikan.api.test.exception.WarungIkanNetworkException;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.SecurityUtils;
 import org.warungikan.db.model.Role;
@@ -35,9 +37,6 @@ import org.warungikan.db.model.ShopItemStock;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.User;
-
-import id.travel.api.test.exception.UserSessionException;
-import id.travel.api.test.exception.WarungIkanNetworkException;
 
 @RestController
 @RequestMapping("/shop")

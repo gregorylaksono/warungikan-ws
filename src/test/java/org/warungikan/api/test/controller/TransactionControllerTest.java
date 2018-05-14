@@ -1,4 +1,4 @@
-package id.travel.api.test.controller;
+package org.warungikan.api.test.controller;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,17 +12,16 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.warungikan.api.model.response.AgentStock;
+import org.warungikan.api.test.exception.UserSessionException;
+import org.warungikan.api.test.exception.WarungIkanNetworkException;
+import org.warungikan.api.test.manager.ShopItemManagerImpl;
+import org.warungikan.api.test.manager.TransactionManagerImpl;
+import org.warungikan.api.test.manager.UserManagerImpl;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
-
-import id.travel.api.test.exception.UserSessionException;
-import id.travel.api.test.exception.WarungIkanNetworkException;
-import id.travel.api.test.manager.ShopItemManagerImpl;
-import id.travel.api.test.manager.TransactionManagerImpl;
-import id.travel.api.test.manager.UserManagerImpl;
 
 public class TransactionControllerTest {
 

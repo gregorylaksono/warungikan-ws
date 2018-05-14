@@ -1,17 +1,16 @@
-package id.travel.api.test.controller;
+package org.warungikan.api.test.controller;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.warungikan.api.controller.ShopItemController;
+import org.warungikan.api.test.exception.UserSessionException;
+import org.warungikan.api.test.exception.WarungIkanNetworkException;
+import org.warungikan.api.test.manager.ShopItemManagerImpl;
+import org.warungikan.api.test.manager.UserManagerImpl;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
-
-import id.travel.api.test.exception.UserSessionException;
-import id.travel.api.test.exception.WarungIkanNetworkException;
-import id.travel.api.test.manager.ShopItemManagerImpl;
-import id.travel.api.test.manager.UserManagerImpl;
 
 public class ShopItemControllerTest {
 

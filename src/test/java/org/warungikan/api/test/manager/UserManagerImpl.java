@@ -1,4 +1,4 @@
-package id.travel.api.test.manager;
+package org.warungikan.api.test.manager;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,13 +25,12 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.warungikan.api.model.BasicResponse;
 import org.warungikan.api.model.ChangePassword;
+import org.warungikan.api.test.exception.UserSessionException;
+import org.warungikan.api.test.exception.WarungIkanNetworkException;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.User;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import id.travel.api.test.exception.UserSessionException;
-import id.travel.api.test.exception.WarungIkanNetworkException;
 
 @Service
 public class UserManagerImpl  {

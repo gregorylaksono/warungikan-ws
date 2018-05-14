@@ -1,4 +1,4 @@
-package id.travel.api.test.service;
+package org.warungikan.api.test.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package id.travel.api.test.manager;
+package org.warungikan.api.test.manager;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -14,14 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.warungikan.api.model.response.AgentStock;
+import org.warungikan.api.test.exception.UserSessionException;
+import org.warungikan.api.test.exception.WarungIkanNetworkException;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
 import org.warungikan.db.model.User;
-
-import id.travel.api.test.exception.UserSessionException;
-import id.travel.api.test.exception.WarungIkanNetworkException;
 
 @Service
 public class TransactionManagerImpl {

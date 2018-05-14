@@ -1,4 +1,4 @@
-package id.travel.api.test.exception;
+package org.warungikan.api.test.exception;
 
 public class WarungIkanNetworkException extends Exception{
 
