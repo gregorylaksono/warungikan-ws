@@ -1,15 +1,11 @@
 package org.warungikan.api.controller;
 
-import java.net.URI;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,23 +15,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.warungikan.api.model.BasicResponse;
 import org.warungikan.api.model.request.VShopItem;
 import org.warungikan.api.service.IShopItemService;
 import org.warungikan.api.service.IUserService;
-import org.warungikan.api.service.impl.ShopItemServiceImpl;
-import org.warungikan.api.test.exception.UserSessionException;
-import org.warungikan.api.test.exception.WarungIkanNetworkException;
 import org.warungikan.api.utils.Constant;
 import org.warungikan.api.utils.SecurityUtils;
 import org.warungikan.db.model.Role;
 import org.warungikan.db.model.ShopItem;
 import org.warungikan.db.model.ShopItemStock;
-import org.warungikan.db.model.Transaction;
-import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.User;
 
 @RestController
