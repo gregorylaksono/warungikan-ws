@@ -120,25 +120,7 @@ public class UserServiceImpl implements IUserService{
 
 	}
 
-	public JavaMailSender getJavaMailSender() throws UnsupportedEncodingException, Exception {
-		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-		mailSender.setHost("srv31.niagahoster.com");
-		mailSender.setPort(Integer.parseInt("465"));
-
-		String password = "@dm1n";
-		mailSender.setUsername("admin@warungikan.com");
-		mailSender.setPassword(password);
-
-		Properties props = mailSender.getJavaMailProperties();
-		props.put("mail.smtp.host", "srv31.niagahoster.com"); //SMTP Host
-		props.put("mail.smtp.port", "465"); //TLS Port
-		props.put("mail.smtp.auth", "true"); //enable authentication
-		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
-		props.put("mail.smtp.socketFactory.class",
-	            "javax.net.ssl.SSLSocketFactory");
-
-		return mailSender;
-	}
+	
 
 	private void sendUserMessage(User user, String link) {
 		String name = user.getName();
@@ -183,7 +165,7 @@ public class UserServiceImpl implements IUserService{
 		try{
 			getJavaMailSender().send(preparator);
 		}catch(Exception e){
-
+			e.printStackTrace();
 		}
 	}
 
@@ -236,31 +218,28 @@ public class UserServiceImpl implements IUserService{
 			e.printStackTrace();
 		}
 	}
-
-	public static void main(String[] args) {
-		final String fromEmail = "admin@warungikan.com"; //requires valid gmail id
-		final String password = "@dm1n"; // correct password for gmail id
-		final String toEmail = "greg.laksono@gmail.com"; // can be any email id 
-		
-		System.out.println("TLSEmail Start");
-		Properties props = new Properties();
-		props.put("mail.smtp.host", "srv31.niagahoster.com"); //SMTP Host
+	public JavaMailSender getJavaMailSender() throws UnsupportedEncodingException, Exception {
+	    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+	    mailSender.setHost("srv31.niagahoster.com");
+	    mailSender.setPort(Integer.parseInt("465"));
+	    
+	    String username = "admin@warungikan.com";
+	    String password = "@dm1n";
+	    mailSender.setUsername(username);
+	    mailSender.setPassword(password);
+	     
+	    Properties props = mailSender.getJavaMailProperties();
+	    props.put("mail.smtp.host", "srv31.niagahoster.com"); //SMTP Host
 		props.put("mail.smtp.port", "465"); //TLS Port
 		props.put("mail.smtp.auth", "true"); //enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
 		props.put("mail.smtp.socketFactory.class",
 	            "javax.net.ssl.SSLSocketFactory");
-		
-                //create Authenticator object to pass in Session.getInstance argument
-		Authenticator auth = new Authenticator() {
-			//override the getPasswordAuthentication method
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(fromEmail, password);
-			}
-		};
-		Session session = Session.getInstance(props, auth);
-		
-		sendEmail(session, toEmail,"TLSEmail Testing Subject", "TLSEmail Testing Body");
+	    return mailSender;
+	}
+	
+	public static void main(String[] args) {
+		new UserServiceImpl().sendUserMessage(User.UserFactory("greg", "greg.laksono@gmail.com", "1234", "add", "test", "1.5548", "5.7789", "pwd"), "http://blabla");
 		
 	}
 	public static void sendEmail(Session session, String toEmail, String subject, String body){
@@ -275,13 +254,9 @@ public class UserServiceImpl implements IUserService{
 	      msg.setFrom(new InternetAddress("admin@warungikan.com", "NoReply-JD"));
 
 	      msg.setReplyTo(InternetAddress.parse("admin@warungikan.com", false));
-
 	      msg.setSubject(subject, "UTF-8");
-
 	      msg.setText(body, "UTF-8");
-
 	      msg.setSentDate(new Date());
-
 	      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 	      System.out.println("Message is ready");
     	  Transport.send(msg);  
