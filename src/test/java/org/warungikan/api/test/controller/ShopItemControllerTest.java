@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.warungikan.api.controller.ShopItemController;
 import org.warungikan.api.test.exception.UserSessionException;
 import org.warungikan.api.test.exception.WarungIkanNetworkException;
 import org.warungikan.api.test.manager.ShopItemManagerImpl;

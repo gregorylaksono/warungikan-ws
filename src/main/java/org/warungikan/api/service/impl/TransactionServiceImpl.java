@@ -389,7 +389,6 @@ public class TransactionServiceImpl implements ITransactionService {
 		return transactionStateRepository.findTransactionStateByTransaction(t);
 	}
 
-
 	@Override
 	public Long calculateTransportPrice(String totalKm, String agent_id) {
 		User agent = userRepository.findUserByUserId(agent_id);
@@ -401,7 +400,7 @@ public class TransactionServiceImpl implements ITransactionService {
 		if(rateS!=null){
 			try{
 				rate = Long.parseLong(rateS);
-				transportPrice = Long.parseLong(totalKm) * rate;
+				transportPrice = new Double(Math.ceil((Double.parseDouble(totalKm) / 1000))).longValue() * rate;
 				return transportPrice;
 			}catch(Exception e){
 				return null;
