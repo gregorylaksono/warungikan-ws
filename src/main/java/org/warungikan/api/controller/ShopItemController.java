@@ -67,7 +67,6 @@ public class ShopItemController {
 	}
 
 	@GetMapping("/item")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 	public ResponseEntity getShopItem() {
 		try {
 			List<ShopItem> items = shopService.getAllShopItem();
@@ -78,7 +77,7 @@ public class ShopItemController {
 	}
 
 	@PostMapping("/stock/{shop_id}/{amount}")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_AGENT')")
 	public ResponseEntity addStock(@PathVariable(value = "shop_id", required=true) String itemId, 
 								   @PathVariable(value = "amount", required=true) Integer amount,
 								   HttpServletRequest request) 

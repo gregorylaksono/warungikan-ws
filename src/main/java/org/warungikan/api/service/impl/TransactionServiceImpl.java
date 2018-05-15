@@ -241,7 +241,14 @@ public class TransactionServiceImpl implements ITransactionService {
 	public List<Transaction> getTransactionAgent(String user_id) {
 		User user  = userRepository.findUserByUserId(user_id);
 		List<Transaction> t = transactionRepository.findTransactionAgent(user);
-		return t;
+		final List<Transaction> trxNew = new ArrayList();
+		for(Transaction o : t) {
+			TransactionState latestState = transactionStateRepository.findLatestStateByTransaction(o);
+			String state = TransactionState.TransactionStateEnum.getStateName(latestState.getState());
+			o.setStatus(state);
+			trxNew.add(o);
+		}
+		return trxNew;
 	}
 
 	@Override

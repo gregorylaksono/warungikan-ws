@@ -108,10 +108,10 @@ public class UserServiceImpl implements IUserService{
 
 				user = userRepository.save(user);
 				agentDataRepository.save(d);
-				sendAgentMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey(), generatedPwd);
+//				sendAgentMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey(), generatedPwd);
 			}else{
 				user = userRepository.save(user);
-				sendUserMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey());
+//				sendUserMessage(user, config.getWeb_ui_reg_conf()+"/"+user.getRandomConfirmationKey());
 			}
 			return user;
 		}else{

@@ -66,9 +66,14 @@ public class ShopItemServiceImpl implements IShopItemService{
 	public ShopItemStock addStock(String shopId, String user_id, Integer amount) {
 		User agent = userRepository.findUserByUserId(user_id);
 		ShopItem item = shopRepository.findOne(Long.parseLong(shopId));
-		ShopItemStock stock = new ShopItemStock();
+		ShopItemStock stock = stockRepository.findStockByAgent(item, agent);
+		 if(stock == null) {
+			 stock = new ShopItemStock();
+			 stock.setCreationDate(new Date());
+		 }else {
+			 stock.setLastModifiedDate(new Date());
+		 }
 		stock.setItem(item);
-		stock.setCreationDate(new Date());
 		stock.setAmount(amount);
 		stock.setAgent(agent);
 		return stockRepository.save(stock);
