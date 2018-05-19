@@ -78,16 +78,17 @@ public class TransactionController {
 	}
 	
 	
-	@PostMapping("/{agent_id}/{transport_price}")
+	@PostMapping("/{agent_id}/{transport_price}/{distance}")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity addTransaction(@PathVariable(value="agent_id", required=true) String agent_id,
 										 @PathVariable(value="transport_price", required=true) String transport_price,
+										 @PathVariable(value="distance", required=true) String distance,
 										 @RequestBody Set<TransactionDetail> details , HttpServletRequest request){
 		try{
 			String token = request.getHeader(Constant.HEADER_STRING);
 			String customer_id = SecurityUtils.getUsernameByToken(token);
 			Long transportPrice = Long.parseLong(transport_price);
-			Transaction trx = transactionService.addTransaction(customer_id, agent_id, details, transportPrice);
+			Transaction trx = transactionService.addTransaction(customer_id, agent_id, details, transportPrice, Long.parseLong(distance));
 			return new ResponseEntity(trx, HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
@@ -108,11 +109,9 @@ public class TransactionController {
 	}
 	
 	@GetMapping("/state")
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
 	public ResponseEntity getTransactionState(@RequestParam(value = "state_id", required = true) String trx_id){
 		try{
-			Long trxId = Long.parseLong(trx_id);
-			List<TransactionState> trxsState = transactionService.getTransactionStateByTransaction(trxId);
+			List<TransactionState> trxsState = transactionService.getTransactionStateByTransaction(trx_id);
 			return new ResponseEntity(trxsState, HttpStatus.ACCEPTED);	
 		}catch(Exception e){
 			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
@@ -137,7 +136,7 @@ public class TransactionController {
 	public ResponseEntity markTransactionAsPaid(@PathVariable(value="trxId", required=true) String trxId){
 		try{
 			TransactionState result = transactionService.markTransactionAsPaid(Long.parseLong(trxId));	
-			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as paid", "SUCCESS", ""), HttpStatus.OK);
+			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as paid", "SUCCESS", ""), HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
 		}
@@ -148,7 +147,7 @@ public class TransactionController {
 	public ResponseEntity markTransactionAsProcessing(@PathVariable(value="trxId", required=true) String trxId){
 		try{
 			TransactionState result = transactionService.markTransactionAsProcessing(Long.parseLong(trxId));	
-			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as processed", "SUCCESS", ""), HttpStatus.OK);
+			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as processed", "SUCCESS", ""), HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
 		}
@@ -159,29 +158,29 @@ public class TransactionController {
 	public ResponseEntity markTransactionAsDelivering(@PathVariable(value="trxId", required=true) String trxId){
 		try{
 			TransactionState result = transactionService.markTransactionAsDelivering(Long.parseLong(trxId));	
-			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as delievered", "SUCCESS", ""), HttpStatus.OK);
+			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as delievered", "SUCCESS", ""), HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	@PutMapping("/mark_receiving/{trxId}")
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
 	public ResponseEntity markTransactionAsReceiving(@PathVariable(value="trxId", required=true) String trxId){
 		try{
 			TransactionState result = transactionService.markTransactionAsReceiving(Long.parseLong(trxId));	
-			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as received", "SUCCESS", ""), HttpStatus.OK);
+			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as received", "SUCCESS", ""), HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	@PutMapping("/mark_cancel/{trxId}")
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT') or hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_AGENT') or hasRole('ROLE_ADMIN')")
 	public ResponseEntity cancelTransaction(@PathVariable(value="trxId", required=true) String trxId){
 		try{
 			TransactionState result = transactionService.cancelTransaction(Long.parseLong(trxId));	
-			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as canceled", "SUCCESS", ""), HttpStatus.OK);
+			return new ResponseEntity(new BasicResponse("Transaction is successfully marked as canceled", "SUCCESS", ""), HttpStatus.ACCEPTED);
 		}catch(Exception e){
 			return new ResponseEntity(new BasicResponse("Error on processing transaction", "FAILED", ""), HttpStatus.BAD_REQUEST);
 		}
@@ -291,6 +290,18 @@ public class TransactionController {
 			String customer_id = SecurityUtils.getUsernameByToken(token);
 		    List<TopupWalletHistory> topups = transactionService.getTopupHistoryByUser(customer_id);
 			return new ResponseEntity(topups, HttpStatus.ACCEPTED);	
+		}catch(Exception e) {
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/detail/{trx_id}")
+	public ResponseEntity getTransactionDetail(HttpServletRequest request, @PathVariable("trx_id") String trxId) {
+		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+		    List<TransactionDetail> details = transactionService.getTransactionDetail(trxId);
+			return new ResponseEntity(details, HttpStatus.ACCEPTED);	
 		}catch(Exception e) {
 			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
 		}

@@ -24,6 +24,7 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ import org.warungikan.db.repository.UserRepository;
 import com.google.gson.Gson;
 
 @Service
+@Transactional
 public class UserServiceImpl implements IUserService{
 
 	@Autowired

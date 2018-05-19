@@ -15,13 +15,13 @@ public interface ITransactionService {
 	public Transaction checkTransaction(String customer_id, String agent_id, String totalKm, Set<TransactionDetail> details);
 	
 	//Customer
-	public Transaction addTransaction(String customer_id, String agent, Set<TransactionDetail> details, Long transportPrice);
+	public Transaction addTransaction(String customer_id, String agent, Set<TransactionDetail> details, Long transportPrice, Long distance);
 	
 	//Customer
 	public List<Transaction> getTransactionCustomer(String user_id);
 	
 	//Customer, Agent
-	public List<TransactionState> getTransactionStateByTransaction(Long oid);
+	public List<TransactionState> getTransactionStateByTransaction(String oid);
 	
 	//Agent
 	public List<Transaction> getTransactionAgent(String user_id);

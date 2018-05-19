@@ -9,11 +9,16 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
+import org.warungikan.api.config.EmailConfig;
 import org.warungikan.api.model.GeoCodeDistance;
 import org.warungikan.api.model.response.AgentStock;
 import org.warungikan.api.service.ITransactionService;
@@ -67,9 +72,15 @@ public class TransactionServiceImpl implements ITransactionService {
 	@Autowired
 	private AgentDataRepository agentDataRepository;
 	
+	@Autowired
+	private EmailConfig config;
+	
+	@Autowired
+	private JavaMailSender mailSender;
+	
 	@Override
 	public Transaction addTransaction(String customer_id, String agentId, Set<TransactionDetail> details,
-			Long transportPrice) {
+			Long transportPrice, Long distance) {
 		
 		User customer =  userRepository.findUserByUserId(customer_id);
 		User agent = userRepository.findUserByUserId(agentId);
@@ -90,8 +101,7 @@ public class TransactionServiceImpl implements ITransactionService {
 		Transaction t = new Transaction();
 		String trxId = generateTrxId(agent);
 		t.setAgent(agent).setCustomer(customer).setTransportPrice(transportPrice).
-		setTotalPrice(totalPrice).setTransactionId(trxId).setCreationDate(new Date());
-//		setTransactionDetails(details).setTotalPrice(totalPrice).setCreationDate(new Date());
+		setTotalPrice(totalPrice).setTransactionId(trxId).setDistance(distance).setCreationDate(new Date());
 		t = transactionRepository.save(t);
 		try{
 			for(TransactionDetail d: details){
@@ -108,21 +118,69 @@ public class TransactionServiceImpl implements ITransactionService {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-//		Long[] ids = extractTrxDetailsId(details);
 		List <TransactionDetail> trxDetails = trxDetailRepository.findTransactionDetailByTransactionId(t);
 		
-		TransactionState state = new TransactionState();
-		state.setTransaction(t);
-		state.setCreationDate(new Date());
-		state.setState(TransactionState.TransactionStateEnum.SENT.getState());
-		transactionStateRepository.save(state);
+		TransactionState sentState = new TransactionState();
+		sentState.setTransaction(t);
+		sentState.setCreationDate(new Date());
+		sentState.setState(TransactionState.TransactionStateEnum.SENT.getState());
+		
+		TransactionState paidState = new TransactionState();
+		paidState.setTransaction(t);
+		paidState.setCreationDate(new Date());
+		paidState.setState(TransactionState.TransactionStateEnum.PAID.getState());
+		transactionStateRepository.save(paidState);
 		
 		if(!updateStockItemByDetail(agent, trxDetails)){
 			return null;
 		}
 		
+//		sendAgentNotification(t, agent, customer);
 	
 		return t;
+	}
+	private void sendAgentNotification(Transaction t, User agent, User customer) {
+			String name = agent.getName();
+			String htmlMessage = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"+
+					"<html lang=\"en\">"+
+					"<head>"+
+					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"+
+					"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"+
+					"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"+
+					"<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">"+
+					"<title></title>"+
+					"<style type=\"text/css\">"+
+					".logo{display:block;width:100%;}"+
+					".message{width:700px;margin:0 auto;}"+
+					"p{font-family: 'Roboto', sans-serif;}"+
+					"</style>"+
+					"</head>"+
+					"<body style=\"margin:0; padding:0; background-color:#F2F2F2;\">"+
+					"<img src=\"http://warungikan.com/images/headweb3.png\" class=\"logo\">"+
+					"<div class=\"message\">"+
+					"<p>Hi "+name+",</p>"+
+					"<p>Anda mendapat pesanan dengan transaksi id "+t.getTransactionId()+". Mohon untuk segera diproses. Untuk lebih detailnya silahkan login di "+config.getWeb_ui()+
+					"<p>Best regards,</p>"+
+					"<p>WarungIkan admin</p>"+
+					"</div>"+
+					"</body>"+
+					"</html>";
+			MimeMessagePreparator preparator = new MimeMessagePreparator(){
+
+				@Override
+				public void prepare(MimeMessage mimeMessage) throws Exception {
+					MimeMessageHelper msg = new MimeMessageHelper(mimeMessage);
+					msg.setTo(agent.getEmail());
+					msg.setSubject("Pesanan "+t.getTransactionId());
+					msg.setFrom("admin@warungikan.com");
+					msg.setText(htmlMessage, true);
+				}
+			};
+			try{
+				mailSender.send(preparator);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 	}
 	private String generateTrxId(User agent) {
 		String ab = agent.getName().substring(0,2).toUpperCase();
@@ -234,7 +292,14 @@ public class TransactionServiceImpl implements ITransactionService {
 	public List<Transaction> getTransactionCustomer(String user_id) {
 		User user  = userRepository.findUserByUserId(user_id);
 		List<Transaction> t = transactionRepository.findTransactionCustomer(user);
-		return t;
+		final List<Transaction> trxNew = new ArrayList();
+		for(Transaction o : t) {
+			TransactionState latestState = transactionStateRepository.findLatestStateByTransaction(o);
+			String state = TransactionState.TransactionStateEnum.getStateName(latestState.getState());
+			o.setStatus(state);
+			trxNew.add(o);
+		}
+		return trxNew;
 	}
 
 	@Override
@@ -252,8 +317,8 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 
 	@Override
-	public List<TransactionState> getTransactionStateByTransaction(Long oid) {
-		Transaction t = transactionRepository.findOne(oid);
+	public List<TransactionState> getTransactionStateByTransaction(String trx_id) {
+		Transaction t = transactionRepository.findTransactionByTrxId(trx_id);
 		List<TransactionState> trxState = transactionStateRepository.findTransactionStateByTransaction(t);
 		return trxState;
 	}
@@ -314,13 +379,29 @@ public class TransactionServiceImpl implements ITransactionService {
 	@Override
 	public TransactionState cancelTransaction(Long trxId) {
 		Transaction t = transactionRepository.findOne(trxId);
-		TransactionState state = transactionStateRepository.findTransactionState(t, TransactionState.TransactionStateEnum.RECEIVED.getState());
+		TransactionState state = transactionStateRepository.findTransactionState(t, TransactionState.TransactionStateEnum.CANCELED.getState());
 		if(state != null){
 			state.setLastModifiedDate(new Date());
 		}else{
 			state = createTransactionState(TransactionState.TransactionStateEnum.CANCELED, t);
 		}
 		transactionStateRepository.save(state);
+		
+//		Rollback transaction
+		List<TransactionDetail> details = trxDetailRepository.findTransactionDetailByTransactionId(t);
+		for(TransactionDetail d: details){
+			TransactionDetail detail = trxDetailRepository.findOne(d.getOid());
+			detail.setIsCanceled(true);
+			detail.setLastModifiedDate(new Date());
+			
+			trxDetailRepository.save(detail);
+			
+			ShopItemStock stock = stockRepository.findStockItemByAgentAndItem(t.getAgent(), detail.getItem());
+			stock.setAmount(stock.getAmount() + detail.getAmount());
+			stockRepository.save(stock);
+			
+			trxDetailRepository.save(detail);
+		}
 		
 		return state;
 	}
@@ -446,7 +527,7 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 	@Override
 	public List<TransactionDetail> getTransactionDetail(String trxId) {
-		Transaction trx = transactionRepository.findOne(Long.parseLong(trxId));
+		Transaction trx = transactionRepository.findTransactionByTrxId(trxId);
 		List<TransactionDetail> list = trxDetailRepository.findTransactionDetailByTransactionId(trx);
 		return list;
 	}
