@@ -135,7 +135,7 @@ public class TransactionServiceImpl implements ITransactionService {
 			return null;
 		}
 		
-//		sendAgentNotification(t, agent, customer);
+		sendAgentNotification(t, agent, customer);
 	
 		return t;
 	}
