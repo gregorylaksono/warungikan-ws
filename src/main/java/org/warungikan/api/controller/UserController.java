@@ -111,9 +111,10 @@ public class UserController {
 		}
 	}
 	
-	@PutMapping("/user/change_password/{user_id}")
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_AGENT')")
-	public ResponseEntity changePassword(@PathVariable(value = "user_id", required = true) String user_id, @RequestBody ChangePassword chPassword){
+	@PutMapping("/user/change_password")
+	public ResponseEntity changePassword(HttpServletRequest request, @RequestBody ChangePassword chPassword){
+		String token = request.getHeader(Constant.HEADER_STRING);
+		String user_id = SecurityUtils.getUsernameByToken(token);
 		Boolean result = userService.changePassword(user_id, chPassword.getPassword(),
 				passwordEncoder.encode(chPassword.getNewPassword()));
 		if(result){

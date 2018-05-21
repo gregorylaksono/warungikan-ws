@@ -32,6 +32,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.warungikan.api.config.EmailConfig;
@@ -268,23 +269,22 @@ public class UserServiceImpl implements IUserService{
 
 	@Override
 	public User update(String user_id, User user) {
-		if(!isUserIdExist(user.getEmail())){
-			User u = userRepository.findUserByUserId(user_id);
-			u.setLastModifiedDate(new Date());
-			u.setAddress(user.getAddress());
-			u.setEmail(user.getEmail());
-			u.setName(user.getName());
-			//			u.setAddressInfo(user.getAddressInfo());
-			//			u.setCity(user.getCity());
-			//			u.setEnable(user.getEnable());
-			//			u.setLatitude(user.getLatitude());
-			//			u.setLongitude(user.getLongitude());
-			//			u.setPassword(user.getPassword());
-			//			u.setRoles(getRoles(user.getRoles()));
-			u.setTelpNo(user.getTelpNo());
-			return userRepository.save(u);			
+		User u = userRepository.findUserByUserId(user_id);
+		if(!u.getEmail().equals(user.getEmail())){
+			if(!isUserIdExist(user.getEmail())){
+				u.setEmail(user.getEmail());
+			}else{
+				return null;
+			}
 		}
-		return null;
+		u.setLastModifiedDate(new Date());
+		u.setAddress(user.getAddress());
+		u.setEmail(user.getEmail());
+		u.setName(user.getName());
+		u.setTelpNo(user.getTelpNo());
+		u.setCity(user.getCity());
+		return userRepository.save(u);		
+						
 	}
 
 	private List<Role> getRoles(Collection<Role> roles){
@@ -317,7 +317,7 @@ public class UserServiceImpl implements IUserService{
 	@Override
 	public Boolean changePassword(String user_id, String password, String newPassword) {
 		User u = userRepository.findUserByUserId(user_id);
-		if(u.getPassword().equalsIgnoreCase(password)){
+		if(BCrypt.checkpw(password,u.getPassword())){
 			u.setPassword(newPassword);
 			userRepository.save(u);
 			return true;
