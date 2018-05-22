@@ -51,7 +51,7 @@ public class ShopItemServiceImpl implements IShopItemService{
 		i.setName(name);
 		i.setPrice(Long.parseLong(price));
 		i.setUrl(url);
-		i.setWeight(Integer.parseInt(weight));
+		i.setWeight(weight);
 		return i;
 	}
 
