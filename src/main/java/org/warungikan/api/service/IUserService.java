@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.warungikan.db.model.AgentData;
 import org.warungikan.db.model.Role;
+import org.warungikan.db.model.TopupWalletHistory;
 import org.warungikan.db.model.User;
 
 public interface IUserService {

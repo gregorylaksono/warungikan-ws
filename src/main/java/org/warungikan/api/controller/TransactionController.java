@@ -284,7 +284,7 @@ public class TransactionController {
 	
 	@GetMapping("/topup/user")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity getAlltopup(HttpServletRequest request) {
+	public ResponseEntity getTopupById(HttpServletRequest request) {
 		try {
 			String token = request.getHeader(Constant.HEADER_STRING);
 			String customer_id = SecurityUtils.getUsernameByToken(token);
