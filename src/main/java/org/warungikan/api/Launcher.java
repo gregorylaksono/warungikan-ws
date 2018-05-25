@@ -36,7 +36,9 @@ public class Launcher {
 	private static final Logger log = LoggerFactory.getLogger(Launcher.class);
 
 	public static void main(String[] args) {
+		log.info("Test application");
         SpringApplication.run(Launcher.class, args);
+        log.info("Finish Test application");
 	}
 
 }
