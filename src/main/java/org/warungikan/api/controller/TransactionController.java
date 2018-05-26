@@ -33,6 +33,7 @@ import org.warungikan.db.model.Transaction;
 import org.warungikan.db.model.TransactionDetail;
 import org.warungikan.db.model.TransactionState;
 import org.warungikan.db.model.User;
+import org.warungikan.db.repository.UserRepository;
 
 @RestController
 @RequestMapping("/transaction")
@@ -282,6 +283,35 @@ public class TransactionController {
 		}
 	}
 	
+	@PutMapping("/topup/{topup_id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity topup(HttpServletRequest request, @PathVariable("topup_id") String topup_id) {
+		try {
+		    Boolean result = transactionService.releaseTopup(Long.parseLong(topup_id));
+			return new ResponseEntity(new BasicResponse("Release topup is success", "SUCCESS", ""), HttpStatus.ACCEPTED);	
+		}catch(Exception e) {
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/topup")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity doTopup(HttpServletRequest request, @RequestBody TopupWalletHistory topup) {
+		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String user_id = SecurityUtils.getUsernameByToken(token);
+			
+		    Boolean result = userService.doTopup(user_id,topup);
+		    if(result){
+		    	return new ResponseEntity(new BasicResponse("Create topup is success", "SUCCESS", ""), HttpStatus.ACCEPTED);	
+		    }else{
+		    	return new ResponseEntity<>(new BasicResponse("Topup request can not be processede","FAILED",""), HttpStatus.BAD_REQUEST);	
+		    }
+		}catch(Exception e) {
+			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@GetMapping("/topup/user")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity getTopupById(HttpServletRequest request) {
@@ -306,4 +336,6 @@ public class TransactionController {
 			return new ResponseEntity<>(new BasicResponse("Request can not be processed","FAILED",""), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+
 }

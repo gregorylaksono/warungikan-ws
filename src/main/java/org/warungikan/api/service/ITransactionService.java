@@ -65,4 +65,8 @@ public interface ITransactionService {
 	public List<TopupWalletHistory> getAllTopupHistory();
 	
 	public List<TopupWalletHistory> getTopupHistoryByUser(String user_id);
+
+	public Boolean releaseTopup(Long parseLong);
+
+	
 }

@@ -347,7 +347,20 @@ public class UserServiceImpl implements IUserService{
 		}
 		return false;
 	}
-
+	@Override
+	public Boolean doTopup(String userId, TopupWalletHistory topup) {
+		try{
+			User u = userRepository.findUserByUserId(userId);
+			topup.setUser(u);
+			topup.setCreationDate(new Date());
+			topup.setRelease(false);
+			topup.setTop_up_id(generateTopupId(u));
+			topUpWalletRepository.save(topup);
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+	}
 	private String generateTopupId(User customer) {
 		String ab = "TP"+customer.getName().substring(0,2).toUpperCase();
 		String random = String.valueOf(new BigDecimal(Math.random() * 1000000)).substring(0,8).replace(".", "");

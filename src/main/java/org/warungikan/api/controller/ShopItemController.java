@@ -114,6 +114,17 @@ public class ShopItemController {
 		}
 	}
 
-
+	@GetMapping("/stocks")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity getAllStock(HttpServletRequest request) {
+		try {
+			String token = request.getHeader(Constant.HEADER_STRING);
+			String username = SecurityUtils.getUsernameByToken(token);
+			List<ShopItemStock> allStock = shopService.getAllStocks();
+			return new ResponseEntity(allStock, HttpStatus.ACCEPTED);
+		}catch(Exception e) {
+			return new ResponseEntity(new BasicResponse("Cannot get shop stock","FAILED",""), HttpStatus.BAD_REQUEST);
+		}
+	}
 
 }

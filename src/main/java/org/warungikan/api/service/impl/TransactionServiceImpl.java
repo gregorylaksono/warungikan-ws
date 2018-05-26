@@ -546,6 +546,19 @@ public class TransactionServiceImpl implements ITransactionService {
 		User customer = userRepository.findUserByUserId(user_id);
 		return topupWalletRepository.findTopupsWalletByUser(customer);
 	}
+	@Override
+	public Boolean releaseTopup(Long topUpId) {
+		try{
+			TopupWalletHistory topUp = topupWalletRepository.findOne(topUpId);
+			topUp.setLastModifiedDate(new Date());
+			topUp.setRelease(true);
+			topupWalletRepository.save(topUp);
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+	}
+
 
 
 

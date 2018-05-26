@@ -29,4 +29,5 @@ public interface IUserService {
 	public Boolean enableUser(String verification_id);
 	public AgentData getAgentData(String user_id);
 	public Boolean changeCoordinate(String user_id, Double lat, Double lng);
+	public Boolean doTopup(String user_id, TopupWalletHistory topup);
 }
